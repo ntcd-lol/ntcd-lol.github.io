@@ -3,7 +3,6 @@
 class MeshAPI {
     constructor() {
         this.possibleDomains = [
-            "http://localhost:8000", // Для локальной разработки
             "https://mesh.loca.lt",
             "https://meshmesh.loca.lt",
             "https://ntcdlol.loca.lt"
