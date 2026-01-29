@@ -5,7 +5,7 @@ class MeshAPI {
         // Добавь сюда свой домен loca.lt, который ты запускаешь
         this.possibleDomains = [
             "https://mesh.loca.lt", 
-            "https://meshmesh.loca.lt"
+            "https://mesh.instatunnel.me"
         ];
         this.baseUrl = null;
         this.user = null;
