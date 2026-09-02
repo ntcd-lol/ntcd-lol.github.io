@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ntcd-lol · engineer</title>
+  <style>
+    /* minimal, but with a touch of character */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #faf9f6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: 'SF Mono', 'Menlo', 'Monaco', 'Cascadia Code', 'Roboto Mono', monospace;
+      padding: 2rem 1.5rem;
+      line-height: 1.6;
+      color: #1e1e1e;
+    }
+
+    .container {
+      max-width: 780px;
+      width: 100%;
+      background: #ffffff;
+      padding: 3rem 2.5rem;
+      border-radius: 28px;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.03), 0 4px 12px rgba(0, 0, 0, 0.02);
+      border: 1px solid #ecece8;
+      transition: all 0.15s ease;
+    }
+
+    /* subtle accent */
+    .accent-line {
+      width: 52px;
+      height: 4px;
+      background: #2b2b2b;
+      margin-bottom: 1.8rem;
+      border-radius: 4px;
+    }
+
+    h1 {
+      font-size: 2.8rem;
+      font-weight: 450;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.2rem;
+      color: #111;
+    }
+
+    .subhead {
+      font-size: 1.1rem;
+      color: #3b3b3b;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid #eaeaea;
+      padding-bottom: 1.2rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem 1.2rem;
+    }
+
+    .subhead span {
+      background: #f0efec;
+      padding: 0.2rem 0.9rem;
+      border-radius: 40px;
+      font-size: 0.9rem;
+      letter-spacing: 0.01em;
+      color: #222;
+    }
+
+    p {
+      margin: 1.5rem 0;
+      font-size: 1rem;
+      color: #242424;
+    }
+
+    .project-block {
+      margin: 2rem 0 1.8rem 0;
+      padding-left: 0.2rem;
+    }
+
+    .project-title {
+      font-weight: 550;
+      font-size: 1.2rem;
+      letter-spacing: -0.01em;
+      color: #0a0a0a;
+      display: inline-block;
+      border-bottom: 2px solid #d0d0cd;
+      padding-bottom: 0.1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .project-desc {
+      margin: 0.5rem 0 1rem 0;
+      padding-left: 0.2rem;
+      color: #2e2e2e;
+    }
+
+    .project-desc strong {
+      font-weight: 550;
+      color: #000;
+    }
+
+    .project-desc code {
+      background: #f1f0ed;
+      padding: 0.15rem 0.45rem;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      color: #1c1c1c;
+      font-family: inherit;
+      letter-spacing: -0.01em;
+    }
+
+    .project-desc i {
+      font-style: italic;
+      color: #3d3d3d;
+    }
+
+    .divider {
+      margin: 2rem 0 1.8rem 0;
+      border: 0;
+      height: 1px;
+      background: linear-gradient(to right, #d4d4d0, #f0f0ec);
+    }
+
+    .signature {
+      margin-top: 2.5rem;
+      display: flex;
+      justify-content: flex-start;
+      align-items: baseline;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      font-size: 0.9rem;
+      color: #3f3f3f;
+      border-top: 1px solid #ecece8;
+      padding-top: 1.8rem;
+    }
+
+    .signature .handle {
+      font-weight: 500;
+      color: #111;
+      letter-spacing: -0.02em;
+    }
+
+    .signature .handle::before {
+      content: "⸻ ";
+      font-weight: 300;
+      color: #aaa;
+    }
+
+    .footnote {
+      color: #5a5a5a;
+      font-size: 0.85rem;
+      letter-spacing: 0.01em;
+    }
+
+    /* tiny responsive */
+    @media (max-width: 500px) {
+      .container {
+        padding: 2rem 1.2rem;
+      }
+      h1 {
+        font-size: 2.2rem;
+      }
+    }
+
+    /* "no special styles" – but we keep it crisp */
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <div class="accent-line"></div>
+
+    <h1>ntcd-lol</h1>
+    <div class="subhead">
+      <span>ML engineer</span>
+      <span>C++ engineer</span>
+      <span>architect · tinkerer</span>
+    </div>
+
+    <p>
+      I design projects around unconventional AI architectures. 
+      Currently deep into <strong>LaMP</strong> — 
+      <i>Language Model rePresentation</i> — 
+      a hybrid approach that combines <code>Encoder-as-Mask</code> 
+      with <code>AExpert</code> (Attention now is Parallel Expert of all model).
+    </p>
+
+    <div class="project-block">
+      <div class="project-title">baddy754</div>
+      <div class="project-desc">
+        <strong>C++ · IEEE 754</strong> — a library built to squeeze every last bit of performance 
+        out of floating‑point internals. Low‑level, aggressive, and obsessive about 
+        the quirks of the format.
+      </div>
+    </div>
+
+    <div class="project-block">
+      <div class="project-title">R&D community (idea)</div>
+      <div class="project-desc">
+        A think‑tank for hard problems: from chip design &amp; ISA 
+        to data types and programming paradigms. 
+        <span style="opacity:0.7; font-size:0.95rem;">— still brewing, but the vision is clear.</span>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <p style="font-size:0.98rem; color:#2a2a2a; margin-top:0.2rem;">
+      <span style="background: #ecebe7; padding:0.1rem 0.5rem; border-radius:30px; font-size:0.85rem;">✦</span> 
+      I build things that bend the usual boundaries — from model internals to 
+      the bare metal of computation.
+    </p>
+
+    <div class="signature">
+      <span class="handle">ntcd-lol</span>
+      <span class="footnote">ML / C++ · architecture · systems</span>
+      <span style="margin-left:auto; opacity:0.5; font-size:0.8rem;">2026</span>
+    </div>
+
+    <!-- tiny hidden detail: no extra fluff, just content -->
+  </div>
+</body>
+</html>
