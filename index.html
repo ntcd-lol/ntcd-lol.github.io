@@ -1,69 +1,222 @@
+<!DOCTYPE html>
 <html>
     <!--- Первое что было в моих мыслях - читай задом наперед. Получится нечитабельно? Попроси помочь. --->
     <head>
         <title>ntcd_lol - programmer</title>
         <style>
-            * {
-              margin: 0;
-              padding: 0;
-              box-sizing: border-box;
-            }
+        :root {
+          --bg-body: #faf9f6;
+          --bg-card: #ffffff;
+          --bg-commit-block: #fdfdfd;
+          --bg-commit-details: #f4f4f2;
 
-            body {
-              background: #faf9f6;
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              min-height: 100vh;
-              font-family: 'SF Mono', 'Menlo', 'Monaco', 'Cascadia Code', 'Roboto Mono', monospace;
-              padding: 2rem 1.5rem;
-              line-height: 1.6;
-              color: #1e1e1e;
-            }
+          --color-main: #1e1e1e;
+          --color-muted: #555555;
+          --color-accent: #8b8b8b;
+          --color-meta: #777777;
 
-            .container {
-              max-width: 780px;
-              width: 100%;
-              background: #ffffff;
-              padding: 3rem 2.5rem;
-              border-radius: 28px;
-              box-shadow: 0 12px 28px rgba(0, 0, 0, 0.03), 0 4px 12px rgba(0, 0, 0, 0.02);
-              border: 1px solid #ecece8;
-              transition: all 0.15s ease;
-            }
+          --border-card: #ecece8;
+          --border-menu: #e0e0e0;
+          --border-commit: #cfcfcd;
 
-            .accent-line {
-                width: 75%;
-                height: 4px;
-                background: #8b8b8b;
-                margin: 0 auto 1.8rem auto;
-                border-radius: 4px;
-            }
+          --shadow: 0 12px 28px rgba(0, 0, 0, 0.03), 0 4px 12px rgba(0, 0, 0, 0.02);
+        }
 
-            h1, h2 {
-                text-align: center;
-            }
+        @media (prefers-color-scheme: dark) {
+          :root {
+            --bg-body: #121212;
+            --bg-card: #1e1e1e;
+            --bg-commit-block: #181818;
+            --bg-commit-details: #252525;
 
-            .block {
-                margin-top: 2%;
-            }
+            --color-main: #e0e0e0;
+            --color-muted: #aaaaaa;
+            --color-accent: #555555;
+            --color-meta: #888888;
 
-            .project {
-                max-width: 780px;
-                width: 100%;
-                background: #ffffff;
-                padding: 2rem 2rem;
-                border-radius: 28px;
-                box-shadow: 0 12px 28px rgba(0, 0, 0, 0.03), 0 4px 12px rgba(0, 0, 0, 0.02);
-                border: 1px solid #ecece8;
-                transition: all 0.15s ease;
-                display: flex;
-                align-items: center;
-                gap: 15px;
-            }
+            --border-card: #2a2a28;
+            --border-menu: #2d2d2d;
+            --border-commit: #444442;
+
+            --shadow: 0 12px 28px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.15);
+          }
+        }
+
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+
+        body {
+          background: var(--bg-body);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          min-height: 100vh;
+          font-family: 'SF Mono', 'Menlo', 'Monaco', 'Cascadia Code', 'Roboto Mono', monospace;
+          padding: 6rem 1.5rem 2rem 1.5rem;
+          line-height: 1.6;
+          color: var(--color-main);
+          margin: 0;
+        }
+
+        a {
+          color: var(--color-main);
+          text-decoration: underline;
+          text-decoration-thickness: 1px;
+          text-underline-offset: 3px;
+          transition: all 0.2s ease;
+        }
+
+        a:hover {
+          color: var(--color-muted);
+          text-decoration-color: transparent;
+        }
+
+        .container {
+          max-width: 780px;
+          width: 100%;
+          background: var(--bg-card);
+          padding: 3rem 2.5rem;
+          border-radius: 28px;
+          box-shadow: var(--shadow);
+          border: 1px solid var(--border-card);
+          transition: all 0.15s ease;
+        }
+
+        .accent-line {
+          width: 75%;
+          height: 4px;
+          background: var(--color-accent);
+          margin: 0 auto 1.8rem auto;
+          border-radius: 4px;
+        }
+
+        h1, h2 {
+          text-align: center;
+        }
+
+        .block {
+          margin-top: 2%;
+        }
+
+        .project {
+          max-width: 780px;
+          width: 100%;
+          background: var(--bg-card);
+          padding: 2rem 2rem;
+          border-radius: 28px;
+          box-shadow: var(--shadow);
+          border: 1px solid var(--border-card);
+          transition: all 0.15s ease;
+          display: flex;
+          align-items: center;
+          gap: 15px;
+          margin-top: 1rem;
+        }
+
+        .top-menu {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          background: var(--bg-card);
+          border-bottom: 1px solid var(--border-menu);
+          z-index: 1000;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0.5rem 2rem;
+          box-sizing: border-box;
+        }
+
+        .me {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+        }
+
+        .top-menu img {
+          border-radius: 50%;
+          width: 50px;
+          height: 50px;
+          object-fit: cover;
+          margin: 0.1rem 0 0.1rem 0;
+        }
+
+        .top-menu h2 {
+          margin: 0;
+          font-size: 1.2rem;
+          color: var(--color-main);
+        }
+
+        .top-menu ul {
+          list-style: none;
+          margin: 0;
+          padding: 0;
+          display: flex;
+          gap: 1rem;
+        }
+
+        .top-menu a {
+          display: block;
+          padding: 0.5rem 1rem;
+          color: var(--color-main);
+          text-decoration: none;
+          font-size: 0.9rem;
+        }
+
+        .top-menu a:hover {
+          opacity: 0.7;
+          color: var(--color-main);
+        }
+
+        #commit-container {
+          margin-top: 2rem;
+          padding: 1.5rem;
+          background: var(--bg-commit-block);
+          border-radius: 16px;
+          border: 1px dashed var(--border-commit);
+        }
+
+        .commit-title {
+          font-size: 1rem;
+          font-weight: bold;
+          margin-bottom: 0.5rem;
+          color: var(--color-muted);
+        }
+
+        .commit-details {
+          font-size: 0.9rem;
+          background: var(--bg-commit-details);
+          padding: 0.8rem;
+          border-radius: 8px;
+          word-break: break-all;
+          color: var(--color-main);
+        }
+
+        .commit-meta {
+          font-size: 0.8rem;
+          color: var(--color-meta);
+          margin-top: 0.5rem;
+        }
         </style>
-    </head>
-    <body>
+
+        <header class="top-menu">
+            <div class="me">
+                <img src="https://avatars.githubusercontent.com/u/198263185?v=4" alt="ntcd_lol avatar">
+                <h2>ntcd_lol.</h2>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#main">main();</a></li>
+                    <li><a href="#docs">docs();</a></li>
+                    <li><a href="#question">question();</a></li>
+                </ul>
+            </nav>
+        </header>
+
         <div class="container">
             <h1>ntcd_lol</h1>
             <div class="accent-line"></div>
@@ -95,6 +248,19 @@
                         </div>
                         <!--- И что тебе это дает? --->
                     </div>
+
+                    <!-- Блок отображения последнего коммита -->
+                    <div id="commit-container">
+                        <div style="display: inline-flex; gap: 10px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-github" viewBox="0 0 16 16">
+                                <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"/>
+                            </svg>
+                            <p class="commit-title"> Last GitHub commit activity:</p>
+                        </div>
+                        <div id="commit-info" class="commit-details">Загрузка данных о коммите...</div>
+                        <div id="commit-meta" class="commit-meta"></div>
+                    </div>
+
                 <!---
                     ???:
                 Бери то что тебе дают, оттуда откуда дают.
@@ -106,6 +272,51 @@
                 --->
             </div>
         </div>
+
+        <script>
+        async function fetchLatestCommit() {
+            const infoElement = document.getElementById('commit-info');
+            const metaElement = document.getElementById('commit-meta');
+
+            try {
+                const reposResponse = await fetch(`https://api.github.com/users/ntcd-lol/repos?sort=pushed&per_page=1`);
+                if (!reposResponse.ok) throw new Error(`Error: ${reposResponse.status}`);
+
+                const repos = await reposResponse.json();
+                if (!repos || repos.length === 0) {
+                    infoElement.textContent = 'Commits not found.';
+                    return;
+                }
+
+                const latestRepo = repos[0];
+                const repoName = latestRepo.full_name;
+                const defaultBranch = latestRepo.default_branch;
+
+                const commitResponse = await fetch(`https://api.github.com/repos/` + repoName + `/commits?sha=${defaultBranch}&per_page=1`);
+                if (!commitResponse.ok) throw new Error(`Ошибка при запросе коммита: ${commitResponse.status}`);
+
+                const commits = await commitResponse.json();
+
+                if (commits && commits.length > 0) {
+                    const lastCommit = commits[0];
+                    const shortSha = lastCommit.sha.substring(0, 7);
+                    const commitMessage = lastCommit.commit.message;
+                    const commitUrl = lastCommit.html_url;
+
+                    infoElement.innerHTML = `<strong>[${shortSha}]</strong> ${commitMessage}`;
+                    metaElement.innerHTML = `In repo: <a href="https://github.com/${repoName}" target="_blank">${repoName}</a> | <a href="${commitUrl}" target="_blank">Open commit.</a>`;
+                } else {
+                    infoElement.textContent = 'Коммиты не найдены.';
+                }
+            } catch (error) {
+                console.error(error);
+                infoElement.textContent = 'Не удалось загрузить последний коммит.';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchLatestCommit);
+
+        </script>
     </body>
 
     <!--- А вот что правда
