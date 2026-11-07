@@ -210,9 +210,9 @@
             </div>
             <nav>
                 <ul>
-                    <li><a href="#main">main();</a></li>
-                    <li><a href="#docs">docs();</a></li>
-                    <li><a href="#question">question();</a></li>
+                    <li><a href="https://ntcd-lol.github.io/">main();</a></li>
+                    <li><a href="https://ntcd-lol.github.io/docs/">docs();</a></li>
+                    <li><a href="https://ntcd-lol.github.io/question/">question();</a></li>
                 </ul>
             </nav>
         </header>
@@ -257,7 +257,7 @@
                             </svg>
                             <p class="commit-title"> Last GitHub commit activity:</p>
                         </div>
-                        <div id="commit-info" class="commit-details">Загрузка данных о коммите...</div>
+                        <div id="commit-info" class="commit-details">Loading...</div>
                         <div id="commit-meta" class="commit-meta"></div>
                     </div>
 
@@ -293,7 +293,7 @@
                 const defaultBranch = latestRepo.default_branch;
 
                 const commitResponse = await fetch(`https://api.github.com/repos/` + repoName + `/commits?sha=${defaultBranch}&per_page=1`);
-                if (!commitResponse.ok) throw new Error(`Ошибка при запросе коммита: ${commitResponse.status}`);
+                if (!commitResponse.ok) throw new Error(`Error: ${commitResponse.status}`);
 
                 const commits = await commitResponse.json();
 
@@ -310,7 +310,7 @@
                 }
             } catch (error) {
                 console.error(error);
-                infoElement.textContent = 'Не удалось загрузить последний коммит.';
+                infoElement.textContent = 'Cannot to load latest commit.';
             }
         }
 
