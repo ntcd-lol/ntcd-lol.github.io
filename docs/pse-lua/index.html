@@ -10,88 +10,155 @@
       --bg-card: #ffffff;
       --bg-commit-block: #fdfdfd;
       --bg-commit-details: #f4f4f2;
+
       --color-main: #1e1e1e;
       --color-muted: #555555;
       --color-accent: #8b8b8b;
       --color-meta: #777777;
+
       --border-card: #ecece8;
       --border-menu: #e0e0e0;
       --border-commit: #cfcfcd;
+
       --shadow: 0 12px 28px rgba(0, 0, 0, 0.03), 0 4px 12px rgba(0, 0, 0, 0.02);
     }
+
     @media (prefers-color-scheme: dark) {
       :root {
         --bg-body: #121212;
         --bg-card: #1e1e1e;
         --bg-commit-block: #181818;
         --bg-commit-details: #252525;
+
         --color-main: #e0e0e0;
         --color-muted: #aaaaaa;
         --color-accent: #555555;
         --color-meta: #888888;
+
         --border-card: #2a2a28;
         --border-menu: #2d2d2d;
         --border-commit: #444442;
+
         --shadow: 0 12px 28px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.15);
       }
     }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
+
     body {
       background: var(--bg-body);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
       font-family: 'SF Mono', 'Menlo', 'Monaco', 'Cascadia Code', 'Roboto Mono', monospace;
       padding: 6rem 1.5rem 2rem 1.5rem;
       line-height: 1.6;
       color: var(--color-main);
-      display: flex;
-      justify-content: center;
-      min-height: 100vh;
     }
-    a { color: var(--color-main); text-decoration: underline; text-underline-offset: 3px; }
+
+    a {
+      color: var(--color-main);
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 3px;
+      transition: all 0.2s ease;
+    }
     a:hover { color: var(--color-muted); text-decoration-color: transparent; }
 
+    /* ---------- top menu ---------- */
     .top-menu {
-      position: fixed; top: 0; left: 0; width: 100%;
-      background: var(--bg-card); border-bottom: 1px solid var(--border-menu);
-      z-index: 1000; display: flex; align-items: center; justify-content: space-between;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border-menu);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       padding: 0.5rem 2rem;
     }
     .top-menu .me { display: flex; align-items: center; gap: 1rem; }
-    .top-menu img { border-radius: 50%; width: 50px; height: 50px; object-fit: cover; }
-    .top-menu h2 { margin: 0; font-size: 1.2rem; }
+    .top-menu img {
+      border-radius: 50%;
+      width: 50px; height: 50px;
+      object-fit: cover;
+    }
+    .top-menu h2 { margin: 0; font-size: 1.2rem; color: var(--color-main); }
     .top-menu ul { list-style: none; display: flex; gap: 1rem; }
-    .top-menu a { display: block; padding: 0.5rem 1rem; text-decoration: none; font-size: 0.9rem; }
+    .top-menu a {
+      display: block;
+      padding: 0.5rem 1rem;
+      color: var(--color-main);
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .top-menu a:hover { opacity: 0.7; color: var(--color-main); }
 
+    /* ---------- container ---------- */
     .container {
-      max-width: 900px; width: 100%;
-      background: var(--bg-card); padding: 3rem 2.5rem;
-      border-radius: 28px; box-shadow: var(--shadow);
+      max-width: 880px;
+      width: 100%;
+      background: var(--bg-card);
+      padding: 3rem 2.5rem;
+      border-radius: 28px;
+      box-shadow: var(--shadow);
       border: 1px solid var(--border-card);
     }
     .accent-line {
-      width: 75%; height: 4px; background: var(--color-accent);
-      margin: 1rem auto 2rem auto; border-radius: 4px;
+      width: 75%;
+      height: 4px;
+      background: var(--color-accent);
+      margin: 1rem auto 2rem auto;
+      border-radius: 4px;
     }
     h1 { text-align: center; }
+
+    /* ---------- meta ---------- */
+    .doc-meta {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--color-meta);
+      margin-bottom: 2rem;
+    }
+
+    /* ---------- sections ---------- */
     .section {
       margin-bottom: 3rem;
       padding-bottom: 1.5rem;
       border-bottom: 1px dashed var(--border-commit);
     }
-    .section:last-child { border-bottom: none; }
+    .section:last-child { border-bottom: none; padding-bottom: 0; }
+
     .section-title {
-      font-size: 1.5rem; margin-bottom: 1rem;
+      font-size: 1.4rem;
+      margin-bottom: 1rem;
       color: var(--color-main);
       border-left: 4px solid var(--color-accent);
       padding-left: 1rem;
+      text-align: left;
     }
+
+    .block-heading {
+      margin: 1.5rem 0 0.75rem 0;
+      font-weight: bold;
+      color: var(--color-main);
+    }
+    .block-heading[data-level="1"] { font-size: 1.5rem; }
+    .block-heading[data-level="2"] { font-size: 1.25rem; }
+    .block-heading[data-level="3"] { font-size: 1.1rem; }
+    .block-heading[data-level="4"],
+    .block-heading[data-level="5"],
+    .block-heading[data-level="6"] { font-size: 1rem; }
+
     .block-prose {
-      margin: 1rem 0; color: var(--color-muted);
-      white-space: pre-wrap; word-break: break-word;
+      margin: 0.75rem 0;
+      color: var(--color-muted);
+      white-space: pre-wrap;
+      word-break: break-word;
     }
-    .block-heading { margin: 1.5rem 0 0.75rem 0; font-weight: bold; }
-    .block-heading[data-level="1"] { font-size: 1.8rem; }
-    .block-heading[data-level="2"] { font-size: 1.4rem; }
-    .block-heading[data-level="3"] { font-size: 1.2rem; }
+
+    /* ---------- code ---------- */
     .block-code {
       margin: 1rem 0;
       background: var(--bg-commit-details);
@@ -100,23 +167,55 @@
       overflow: hidden;
     }
     .block-code-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       padding: 0.4rem 1rem;
       background: var(--bg-commit-block);
       border-bottom: 1px solid var(--border-commit);
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       color: var(--color-meta);
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
     .block-code pre {
-      margin: 0; padding: 1rem 1.2rem;
+      margin: 0;
+      padding: 1rem 1.2rem;
       overflow-x: auto;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       line-height: 1.5;
       color: var(--color-main);
     }
     .block-code code { font-family: inherit; }
-    .loading { text-align: center; color: var(--color-muted); padding: 2rem; }
+
+    .copy-btn {
+      background: transparent;
+      border: 1px solid var(--border-commit);
+      color: var(--color-meta);
+      font-family: inherit;
+      font-size: 0.7rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      cursor: pointer;
+      text-transform: uppercase;
+    }
+    .copy-btn:hover { color: var(--color-main); border-color: var(--color-accent); }
+    .copy-btn.copied { color: #4caf50; border-color: #4caf50; }
+
+    /* ---------- states ---------- */
+    .loading, .error {
+      text-align: center;
+      padding: 2rem;
+      color: var(--color-muted);
+    }
+    .error { color: #d9534f; }
+
+    @media (max-width: 640px) {
+      .top-menu { padding: 0.5rem 1rem; }
+      .top-menu ul { gap: 0.25rem; }
+      .top-menu a { padding: 0.5rem 0.5rem; font-size: 0.8rem; }
+      .container { padding: 2rem 1.25rem; }
+    }
   </style>
 </head>
 <body>
@@ -135,72 +234,145 @@
   </header>
 
   <div class="container">
-    <h1>pse-lua</h1>
+    <h1 id="doc-title">docs</h1>
     <div class="accent-line"></div>
-    <div id="app"><p class="loading">Loading manifest...</p></div>
+    <div id="doc-meta" class="doc-meta"></div>
+    <div id="app"><p class="loading">Loading manifest…</p></div>
   </div>
 
   <script>
-    async function loadManifest() {
-      const app = document.getElementById('app');
-      try {
-        const res = await fetch('./manifest.json');
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        const manifest = await res.json();
-        render(manifest);
-      } catch (e) {
-        app.innerHTML = '<p class="loading">Failed to load manifest.json</p>';
-        console.error(e);
-      }
+  // ---- настройка ----
+  const GIST_RAW_URL =
+    'https://gist.githubusercontent.com/ntcd-lol/REPLACE_WITH_GIST_ID/raw/manifest.json';
+
+  const app     = document.getElementById('app');
+  const titleEl = document.getElementById('doc-title');
+  const metaEl  = document.getElementById('doc-meta');
+
+  async function loadManifest() {
+    try {
+      // cache-buster: gist кешируется ~5 мин, t сбивает кеш браузера
+      const url = `${GIST_RAW_URL}?t=${Date.now()}`;
+      const res = await fetch(url, { cache: 'no-cache' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const manifest = await res.json();
+      render(manifest);
+    } catch (err) {
+      console.error(err);
+      app.innerHTML = `<p class="error">Failed to load manifest.json: ${err.message}</p>`;
+    }
+  }
+
+  function render(manifest) {
+    if (manifest.project) titleEl.textContent = manifest.project;
+    if (manifest.owner) {
+      metaEl.textContent =
+        `${manifest.owner}/${manifest.project} · generated ${formatDate(manifest.generatedAt)}`;
     }
 
-    function render(manifest) {
-      const app = document.getElementById('app');
-      app.innerHTML = '';
+    app.innerHTML = '';
 
-      for (const section of manifest.sections) {
-        const secEl = document.createElement('div');
-        secEl.className = 'section';
+    if (!Array.isArray(manifest.sections) || manifest.sections.length === 0) {
+      app.innerHTML = '<p class="loading">Manifest is empty.</p>';
+      return;
+    }
 
-        const title = document.createElement('h2');
-        title.className = 'section-title';
-        title.textContent = section.title;
-        secEl.appendChild(title);
+    for (const section of manifest.sections) {
+      const secEl = document.createElement('section');
+      secEl.className = 'section';
 
+      const h = document.createElement('h2');
+      h.className = 'section-title';
+      h.textContent = section.title || section.id;
+      secEl.appendChild(h);
+
+      if (Array.isArray(section.blocks)) {
         for (const block of section.blocks) {
-          if (block.type === 'heading') {
-            const h = document.createElement('div');
-            h.className = 'block-heading';
-            h.dataset.level = block.level;
-            h.textContent = block.content;
-            secEl.appendChild(h);
-          } else if (block.type === 'prose') {
-            const p = document.createElement('div');
-            p.className = 'block-prose';
-            p.textContent = block.content;
-            secEl.appendChild(p);
-          } else if (block.type === 'code') {
-            const wrap = document.createElement('div');
-            wrap.className = 'block-code';
-            if (block.language) {
-              const header = document.createElement('div');
-              header.className = 'block-code-header';
-              header.textContent = block.language;
-              wrap.appendChild(header);
-            }
-            const pre = document.createElement('pre');
-            const code = document.createElement('code');
-            code.textContent = block.content;
-            pre.appendChild(code);
-            wrap.appendChild(pre);
-            secEl.appendChild(wrap);
-          }
+          secEl.appendChild(renderBlock(block));
         }
-        app.appendChild(secEl);
       }
+
+      app.appendChild(secEl);
+    }
+  }
+
+  function renderBlock(block) {
+    if (!block || typeof block !== 'object') {
+      const p = document.createElement('p');
+      p.className = 'block-prose';
+      p.textContent = String(block);
+      return p;
     }
 
-    document.addEventListener('DOMContentLoaded', loadManifest);
+    switch (block.type) {
+      case 'heading': {
+        const el = document.createElement('div');
+        el.className = 'block-heading';
+        el.dataset.level = block.level || 3;
+        el.textContent = block.content || '';
+        return el;
+      }
+
+      case 'code': {
+        const wrap = document.createElement('div');
+        wrap.className = 'block-code';
+
+        const header = document.createElement('div');
+        header.className = 'block-code-header';
+
+        const lang = document.createElement('span');
+        lang.textContent = block.language || 'text';
+        header.appendChild(lang);
+
+        const btn = document.createElement('button');
+        btn.className = 'copy-btn';
+        btn.type = 'button';
+        btn.textContent = 'copy';
+        btn.addEventListener('click', async () => {
+          try {
+            await navigator.clipboard.writeText(block.content || '');
+            btn.textContent = 'copied';
+            btn.classList.add('copied');
+            setTimeout(() => {
+              btn.textContent = 'copy';
+              btn.classList.remove('copied');
+            }, 1500);
+          } catch {
+            btn.textContent = 'err';
+          }
+        });
+        header.appendChild(btn);
+
+        const pre = document.createElement('pre');
+        const code = document.createElement('code');
+        code.textContent = block.content || '';
+        pre.appendChild(code);
+
+        wrap.appendChild(header);
+        wrap.appendChild(pre);
+        return wrap;
+      }
+
+      case 'prose':
+      default: {
+        const p = document.createElement('div');
+        p.className = 'block-prose';
+        p.textContent = block.content || '';
+        return p;
+      }
+    }
+  }
+
+  function formatDate(iso) {
+    if (!iso) return 'unknown';
+    try {
+      return new Date(iso).toLocaleString();
+    } catch {
+      return iso;
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', loadManifest);
   </script>
 </body>
 </html>
