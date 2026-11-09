@@ -4,219 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>pse-lua — docs</title>
-  <style>
-    :root {
-      --bg-body: #faf9f6;
-      --bg-card: #ffffff;
-      --bg-commit-block: #fdfdfd;
-      --bg-commit-details: #f4f4f2;
-
-      --color-main: #1e1e1e;
-      --color-muted: #555555;
-      --color-accent: #8b8b8b;
-      --color-meta: #777777;
-
-      --border-card: #ecece8;
-      --border-menu: #e0e0e0;
-      --border-commit: #cfcfcd;
-
-      --shadow: 0 12px 28px rgba(0, 0, 0, 0.03), 0 4px 12px rgba(0, 0, 0, 0.02);
-    }
-
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg-body: #121212;
-        --bg-card: #1e1e1e;
-        --bg-commit-block: #181818;
-        --bg-commit-details: #252525;
-
-        --color-main: #e0e0e0;
-        --color-muted: #aaaaaa;
-        --color-accent: #555555;
-        --color-meta: #888888;
-
-        --border-card: #2a2a28;
-        --border-menu: #2d2d2d;
-        --border-commit: #444442;
-
-        --shadow: 0 12px 28px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.15);
-      }
-    }
-
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body {
-      background: var(--bg-body);
-      display: flex;
-      justify-content: center;
-      min-height: 100vh;
-      font-family: 'SF Mono', 'Menlo', 'Monaco', 'Cascadia Code', 'Roboto Mono', monospace;
-      padding: 6rem 1.5rem 2rem 1.5rem;
-      line-height: 1.6;
-      color: var(--color-main);
-    }
-
-    a {
-      color: var(--color-main);
-      text-decoration: underline;
-      text-decoration-thickness: 1px;
-      text-underline-offset: 3px;
-      transition: all 0.2s ease;
-    }
-    a:hover { color: var(--color-muted); text-decoration-color: transparent; }
-
-    /* ---------- top menu ---------- */
-    .top-menu {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%;
-      background: var(--bg-card);
-      border-bottom: 1px solid var(--border-menu);
-      z-index: 1000;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0.5rem 2rem;
-    }
-    .top-menu .me { display: flex; align-items: center; gap: 1rem; }
-    .top-menu img {
-      border-radius: 50%;
-      width: 50px; height: 50px;
-      object-fit: cover;
-    }
-    .top-menu h2 { margin: 0; font-size: 1.2rem; color: var(--color-main); }
-    .top-menu ul { list-style: none; display: flex; gap: 1rem; }
-    .top-menu a {
-      display: block;
-      padding: 0.5rem 1rem;
-      color: var(--color-main);
-      text-decoration: none;
-      font-size: 0.9rem;
-    }
-    .top-menu a:hover { opacity: 0.7; color: var(--color-main); }
-
-    /* ---------- container ---------- */
-    .container {
-      max-width: 880px;
-      width: 100%;
-      background: var(--bg-card);
-      padding: 3rem 2.5rem;
-      border-radius: 28px;
-      box-shadow: var(--shadow);
-      border: 1px solid var(--border-card);
-    }
-    .accent-line {
-      width: 75%;
-      height: 4px;
-      background: var(--color-accent);
-      margin: 1rem auto 2rem auto;
-      border-radius: 4px;
-    }
-    h1 { text-align: center; }
-
-    /* ---------- meta ---------- */
-    .doc-meta {
-      text-align: center;
-      font-size: 0.8rem;
-      color: var(--color-meta);
-      margin-bottom: 2rem;
-    }
-
-    /* ---------- sections ---------- */
-    .section {
-      margin-bottom: 3rem;
-      padding-bottom: 1.5rem;
-      border-bottom: 1px dashed var(--border-commit);
-    }
-    .section:last-child { border-bottom: none; padding-bottom: 0; }
-
-    .section-title {
-      font-size: 1.4rem;
-      margin-bottom: 1rem;
-      color: var(--color-main);
-      border-left: 4px solid var(--color-accent);
-      padding-left: 1rem;
-      text-align: left;
-    }
-
-    .block-heading {
-      margin: 1.5rem 0 0.75rem 0;
-      font-weight: bold;
-      color: var(--color-main);
-    }
-    .block-heading[data-level="1"] { font-size: 1.5rem; }
-    .block-heading[data-level="2"] { font-size: 1.25rem; }
-    .block-heading[data-level="3"] { font-size: 1.1rem; }
-    .block-heading[data-level="4"],
-    .block-heading[data-level="5"],
-    .block-heading[data-level="6"] { font-size: 1rem; }
-
-    .block-prose {
-      margin: 0.75rem 0;
-      color: var(--color-muted);
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-
-    /* ---------- code ---------- */
-    .block-code {
-      margin: 1rem 0;
-      background: var(--bg-commit-details);
-      border-radius: 12px;
-      border: 1px solid var(--border-commit);
-      overflow: hidden;
-    }
-    .block-code-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0.4rem 1rem;
-      background: var(--bg-commit-block);
-      border-bottom: 1px solid var(--border-commit);
-      font-size: 0.75rem;
-      color: var(--color-meta);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .block-code pre {
-      margin: 0;
-      padding: 1rem 1.2rem;
-      overflow-x: auto;
-      font-size: 0.85rem;
-      line-height: 1.5;
-      color: var(--color-main);
-    }
-    .block-code code { font-family: inherit; }
-
-    .copy-btn {
-      background: transparent;
-      border: 1px solid var(--border-commit);
-      color: var(--color-meta);
-      font-family: inherit;
-      font-size: 0.7rem;
-      padding: 0.15rem 0.5rem;
-      border-radius: 4px;
-      cursor: pointer;
-      text-transform: uppercase;
-    }
-    .copy-btn:hover { color: var(--color-main); border-color: var(--color-accent); }
-    .copy-btn.copied { color: #4caf50; border-color: #4caf50; }
-
-    /* ---------- states ---------- */
-    .loading, .error {
-      text-align: center;
-      padding: 2rem;
-      color: var(--color-muted);
-    }
-    .error { color: #d9534f; }
-
-    @media (max-width: 640px) {
-      .top-menu { padding: 0.5rem 1rem; }
-      .top-menu ul { gap: 0.25rem; }
-      .top-menu a { padding: 0.5rem 0.5rem; font-size: 0.8rem; }
-      .container { padding: 2rem 1.25rem; }
-    }
-  </style>
+  <link rel="stylesheet" href="../../static/style.css">
 </head>
 <body>
   <header class="top-menu">
@@ -233,72 +21,412 @@
     </nav>
   </header>
 
-  <div class="container">
-    <h1 id="doc-title">docs</h1>
-    <div class="accent-line"></div>
-    <div id="doc-meta" class="doc-meta"></div>
-    <div id="app"><p class="loading">Loading manifest…</p></div>
+  <div class="layout">
+    <aside class="sidebar" id="sidebar">
+      <h3>Contents</h3>
+      <ul id="toc"><li class="loading">Loading…</li></ul>
+    </aside>
+
+    <div class="container docs-container">
+      <div id="app" class="page-host">
+        <p class="loading">Loading manifest…</p>
+      </div>
+    </div>
   </div>
 
+  <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle sidebar">☰</button>
+
   <script>
-  // ---- настройка ----
   const GIST_RAW_URL =
     'https://gist.githubusercontent.com/ntcd-lol/b4b3652e08f3272fd16cc1017311b3d9/raw/pselua-manifest.json';
 
+  const RAW_BASE =
+    'https://raw.githubusercontent.com/ntcd-lol/pse-lua/main';
+
   const app     = document.getElementById('app');
-  const titleEl = document.getElementById('doc-title');
-  const metaEl  = document.getElementById('doc-meta');
+  const tocEl   = document.getElementById('toc');
+  const sidebar = document.getElementById('sidebar');
+  const sidebarToggle = document.getElementById('sidebar-toggle');
+
+  const usedIds = new Set();
+
+  let manifest = null;
+  let sectionById = new Map();
+  let orderedSections = [];
+  let currentSectionId = null;
+
+  sidebarToggle.addEventListener('click', () => sidebar.classList.toggle('open'));
+
+  function slugify(text) {
+    const map = {
+      'а':'a','б':'b','в':'v','г':'g','д':'d','е':'e','ё':'yo','ж':'zh',
+      'з':'z','и':'i','й':'y','к':'k','л':'l','м':'m','н':'n','о':'o',
+      'п':'p','р':'r','с':'s','т':'t','у':'u','ф':'f','х':'h','ц':'ts',
+      'ч':'ch','ш':'sh','щ':'sch','ъ':'','ы':'y','ь':'','э':'e','ю':'yu',
+      'я':'ya'
+    };
+
+    return String(text || '')
+      .toLowerCase()
+      .split('')
+      .map(ch => map[ch] !== undefined ? map[ch] : ch)
+      .join('')
+      .replace(/[`*_~\[\](){}<>]/g, '')
+      .replace(/[^a-z0-9\s-]/g, '')
+      .trim()
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '') || 'section';
+  }
+
+  function ensureUniqueId(base) {
+    let id = base;
+    let n = 1;
+    while (usedIds.has(id)) {
+      id = `${base}-${n++}`;
+    }
+    usedIds.add(id);
+    return id;
+  }
+
+  function stripHtmlComments(s) {
+    return (s || '').replace(/<!--[\s\S]*?-->/g, '');
+  }
+
+  function absUrl(href) {
+    if (!href) return '#';
+    if (/^(https?:)?\/\//.test(href) || href.startsWith('#')) return href;
+    if (href.startsWith('/')) return RAW_BASE + href;
+    return href;
+  }
+
+  function rewriteHtmlAssets(html) {
+    return (html || '')
+      .replace(/\bsrc=(["'])(\/[^"']+)\1/g, (_, q, p) => `src=${q}${RAW_BASE}${p}${q}`)
+      .replace(/\bhref=(["'])(\/[^"']+)\1/g, (_, q, p) => {
+        if (p.startsWith('//')) return `href=${q}${p}${q}`;
+        return `href=${q}${RAW_BASE}${p}${q}`;
+      });
+  }
 
   async function loadManifest() {
     try {
-      // cache-buster: gist кешируется ~5 мин, t сбивает кеш браузера
       const url = `${GIST_RAW_URL}?t=${Date.now()}`;
       const res = await fetch(url, { cache: 'no-cache' });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const manifest = await res.json();
-      render(manifest);
+      init(await res.json());
     } catch (err) {
       console.error(err);
       app.innerHTML = `<p class="error">Failed to load manifest.json: ${err.message}</p>`;
+      tocEl.innerHTML = '<li class="error">Failed</li>';
     }
   }
 
-  function render(manifest) {
-    if (manifest.project) titleEl.textContent = manifest.project;
-    if (manifest.owner) {
-      metaEl.textContent =
-        `${manifest.owner}/${manifest.project} · generated ${formatDate(manifest.generatedAt)}`;
+  function init(data) {
+    manifest = data;
+    orderedSections = Array.isArray(data.sections) ? data.sections : [];
+    sectionById = new Map(orderedSections.map(s => [s.id, s]));
+
+    buildSidebar();
+
+    window.addEventListener('hashchange', () => routeFromHash(true));
+    routeFromHash(false);
+  }
+
+  function parseHash() {
+    const raw = location.hash.replace(/^#/, '');
+    if (!raw) return { sectionId: null, anchorId: null };
+
+    if (sectionById.has(raw)) {
+      return { sectionId: raw, anchorId: null };
     }
 
-    app.innerHTML = '';
+    const byPrefix = orderedSections.find(s => raw.startsWith(`sec-${s.id}-`));
+    if (byPrefix) return { sectionId: byPrefix.id, anchorId: raw };
 
-    if (!Array.isArray(manifest.sections) || manifest.sections.length === 0) {
-      app.innerHTML = '<p class="loading">Manifest is empty.</p>';
-      return;
+    const secRaw = raw.startsWith('sec-') ? raw.slice(4) : null;
+    if (secRaw && sectionById.has(secRaw)) {
+      return { sectionId: secRaw, anchorId: null };
     }
 
-    for (const section of manifest.sections) {
-      const secEl = document.createElement('section');
-      secEl.className = 'section';
+    return { sectionId: null, anchorId: null };
+  }
 
-      const h = document.createElement('h2');
-      h.className = 'section-title';
-      h.textContent = section.title || section.id;
-      secEl.appendChild(h);
+  function routeFromHash(scroll) {
+    const { sectionId, anchorId } = parseHash();
+    const target = sectionId || (orderedSections[0] && orderedSections[0].id);
+    if (!target) return;
 
-      if (Array.isArray(section.blocks)) {
-        for (const block of section.blocks) {
-          secEl.appendChild(renderBlock(block));
+    if (target !== currentSectionId) {
+      renderPage(target, () => {
+        if (anchorId) scrollToAnchor(anchorId);
+        else window.scrollTo({ top: 0, behavior: scroll ? 'smooth' : 'auto' });
+      });
+    } else if (anchorId) {
+      scrollToAnchor(anchorId);
+    } else if (scroll) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    updateActiveSidebar(target, anchorId);
+  }
+
+  function scrollToAnchor(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function buildSidebar() {
+    tocEl.innerHTML = '';
+
+    for (const section of orderedSections) {
+      const li = document.createElement('li');
+      li.className = 'toc-file';
+
+      const a = document.createElement('a');
+      a.href = `#${section.id}`;
+      a.textContent = section.title || section.id;
+      a.dataset.target = section.id;
+      a.dataset.kind = 'section';
+      li.appendChild(a);
+
+      const children = collectTocChildren(section);
+      if (children.length) {
+        const ul = document.createElement('ul');
+        for (const child of children) {
+          ul.appendChild(buildTocItem(child));
         }
+        li.appendChild(ul);
       }
 
-      app.appendChild(secEl);
+      tocEl.appendChild(li);
     }
   }
 
-  function renderBlock(block) {
+  function buildTocItem(node) {
+    const li = document.createElement('li');
+
+    const a = document.createElement('a');
+    a.href = `#${node.id}`;
+    a.textContent = node.title;
+    a.dataset.target = node.id;
+    a.dataset.kind = 'heading';
+    li.appendChild(a);
+
+    if (node.children && node.children.length) {
+      const ul = document.createElement('ul');
+      for (const sub of node.children) {
+        ul.appendChild(buildTocItem(sub));
+      }
+      li.appendChild(ul);
+    }
+    return li;
+  }
+
+  function collectTocChildren(section) {
+    const tree = [];
+    for (const block of section.blocks || []) {
+      if (!block || block.type !== 'heading') continue;
+      const level = block.level || 3;
+      if (level > 3) continue;
+
+      const text = inlineToText(block.inline);
+      if (!text.trim()) continue;
+
+      const slug = slugify(text);
+      const id = `${section.id}-${slug}`;
+
+      if (level === 1 || level === 2) {
+        tree.push({ id, title: text.trim(), level, children: [] });
+      } else if (level === 3) {
+        const parent = [...tree].reverse().find(c => c.level <= 2);
+        if (parent) parent.children.push({ id, title: text.trim(), level });
+        else tree.push({ id, title: text.trim(), level, children: [] });
+      }
+    }
+    return tree;
+  }
+
+  function inlineToText(nodes) {
+    if (!Array.isArray(nodes)) return '';
+    return nodes.map(n => n.value || n.text || '').join('');
+  }
+
+  function updateActiveSidebar(sectionId, anchorId) {
+    const links = Array.from(tocEl.querySelectorAll('a'));
+    links.forEach(a => a.classList.remove('active'));
+
+    let active = null;
+    if (anchorId) {
+      active = links.find(a => a.dataset.target === anchorId);
+    }
+    if (!active && sectionId) {
+      active = links.find(a => a.dataset.kind === 'section' && a.dataset.target === sectionId);
+    }
+    if (active) active.classList.add('active');
+  }
+
+  function renderPage(sectionId, onDone) {
+    const section = sectionById.get(sectionId);
+    if (!section) return;
+
+    currentSectionId = sectionId;
+    usedIds.clear();
+
+    const oldPage = app.querySelector('.page');
+    const newPage = document.createElement('div');
+    newPage.className = 'page page-enter';
+    newPage.dataset.sectionId = sectionId;
+
+    const navTargets = [];
+    for (const block of section.blocks || []) {
+      const node = renderBlock(block, section.id, navTargets);
+      if (node) newPage.appendChild(node);
+    }
+
+    newPage.appendChild(buildPageNav(section.id));
+
+    const swap = () => {
+      if (oldPage) {
+        oldPage.classList.add('page-leave');
+        oldPage.addEventListener('animationend', () => oldPage.remove(), { once: true });
+        setTimeout(() => { if (oldPage.parentNode) oldPage.remove(); }, 400);
+      }
+      app.innerHTML = '';
+      app.appendChild(newPage);
+
+      requestAnimationFrame(() => {
+        newPage.classList.add('page-enter-active');
+        newPage.addEventListener('animationend', () => {
+          newPage.classList.remove('page-enter', 'page-enter-active');
+          if (onDone) onDone();
+          setupScrollSpy(navTargets);
+        }, { once: true });
+        setTimeout(() => {
+          newPage.classList.remove('page-enter', 'page-enter-active');
+          if (onDone) onDone();
+          setupScrollSpy(navTargets);
+        }, 500);
+      });
+    };
+
+    swap();
+  }
+
+  function buildPageNav(sectionId) {
+    const idx = orderedSections.findIndex(s => s.id === sectionId);
+    const prev = orderedSections[idx - 1];
+    const next = orderedSections[idx + 1];
+
+    const nav = document.createElement('nav');
+    nav.className = 'page-nav';
+
+    if (prev) {
+      const a = document.createElement('a');
+      a.href = `#${prev.id}`;
+      a.className = 'page-nav-prev';
+      a.textContent = `← ${prev.title || prev.id}`;
+      nav.appendChild(a);
+    } else {
+      nav.appendChild(document.createElement('span'));
+    }
+
+    if (next) {
+      const a = document.createElement('a');
+      a.href = `#${next.id}`;
+      a.className = 'page-nav-next';
+      a.textContent = `${next.title || next.id} →`;
+      nav.appendChild(a);
+    } else {
+      nav.appendChild(document.createElement('span'));
+    }
+
+    return nav;
+  }
+
+  function renderInline(nodes) {
+    const frag = document.createDocumentFragment();
+
+    if (!Array.isArray(nodes)) {
+      if (typeof nodes === 'string') {
+        const v = stripHtmlComments(nodes);
+        if (!v) return frag;
+        if (/^\s*<[a-z]/i.test(v) && /<\/[a-z]/i.test(v)) {
+          const span = document.createElement('span');
+          span.innerHTML = rewriteHtmlAssets(v);
+          frag.appendChild(span);
+        } else {
+          frag.appendChild(document.createTextNode(v));
+        }
+      }
+      return frag;
+    }
+
+    for (const n of nodes) {
+      if (!n) continue;
+      switch (n.type) {
+        case 'text': {
+          const v = stripHtmlComments(n.value || '');
+          if (!v) break;
+          if (/^\s*<[a-z]/i.test(v) && /<\/[a-z]/i.test(v)) {
+            const span = document.createElement('span');
+            span.innerHTML = rewriteHtmlAssets(v);
+            frag.appendChild(span);
+          } else {
+            frag.appendChild(document.createTextNode(v));
+          }
+          break;
+        }
+        case 'code': {
+          const el = document.createElement('code');
+          el.className = 'inline-code';
+          el.textContent = n.value || '';
+          frag.appendChild(el);
+          break;
+        }
+        case 'bold': {
+          const el = document.createElement('strong');
+          el.textContent = n.value || '';
+          frag.appendChild(el);
+          break;
+        }
+        case 'italic': {
+          const el = document.createElement('em');
+          el.textContent = n.value || '';
+          frag.appendChild(el);
+          break;
+        }
+        case 'link': {
+          const a = document.createElement('a');
+          a.href = absUrl(n.href || '#');
+          a.textContent = n.text || '';
+          if (!n.href || !n.href.startsWith('#')) {
+            a.target = '_blank';
+            a.rel = 'noopener';
+          }
+          frag.appendChild(a);
+          break;
+        }
+        case 'image': {
+          const img = document.createElement('img');
+          img.src = absUrl(n.src || '');
+          img.alt = n.alt || '';
+          img.style.maxWidth = '100%';
+          img.style.height = 'auto';
+          frag.appendChild(img);
+          break;
+        }
+        default:
+          frag.appendChild(document.createTextNode(String(n.value || '')));
+      }
+    }
+    return frag;
+  }
+
+  function renderBlock(block, sectionId, navTargets) {
     if (!block || typeof block !== 'object') {
-      const p = document.createElement('p');
+      const p = document.createElement('div');
       p.className = 'block-prose';
       p.textContent = String(block);
       return p;
@@ -306,11 +434,99 @@
 
     switch (block.type) {
       case 'heading': {
+        const level = block.level || 3;
         const el = document.createElement('div');
         el.className = 'block-heading';
-        el.dataset.level = block.level || 3;
-        el.textContent = block.content || '';
+        el.dataset.level = level;
+
+        const text = inlineToText(block.inline);
+        const baseSlug = slugify(text);
+        const uniqueId = ensureUniqueId(`${sectionId}-${baseSlug}`);
+        el.id = uniqueId;
+        navTargets.push(uniqueId);
+
+        if (Array.isArray(block.inline)) {
+          el.appendChild(renderInline(block.inline));
+        } else if (typeof block.content === 'string') {
+          const c = stripHtmlComments(block.content);
+          if (/^\s*<[a-z]/i.test(c) && /<\/[a-z]/i.test(c)) {
+            el.innerHTML = rewriteHtmlAssets(c);
+          } else {
+            el.textContent = c;
+          }
+        }
         return el;
+      }
+
+      case 'callout': {
+        const box = document.createElement('div');
+        box.className = 'block-callout';
+        box.dataset.variant = block.variant || 'note';
+
+        const head = document.createElement('div');
+        head.className = 'block-callout-head';
+        head.textContent = labelForVariant(block.variant);
+        box.appendChild(head);
+
+        const body = document.createElement('div');
+        body.className = 'block-callout-body';
+        if (Array.isArray(block.inline)) {
+          body.appendChild(renderInline(block.inline));
+        } else if (typeof block.content === 'string') {
+          body.textContent = stripHtmlComments(block.content);
+        }
+        box.appendChild(body);
+        return box;
+      }
+
+      case 'html': {
+        const el = document.createElement('div');
+        el.className = 'block-html';
+        const cleaned = stripHtmlComments(block.content || '');
+        el.innerHTML = rewriteHtmlAssets(cleaned);
+        return el;
+      }
+
+      case 'table': {
+        const wrap = document.createElement('div');
+        wrap.className = 'block-table-wrap';
+        const table = document.createElement('table');
+        table.className = 'block-table';
+
+        const thead = document.createElement('thead');
+        const trH = document.createElement('tr');
+        for (const cell of block.header || []) {
+          const th = document.createElement('th');
+          th.appendChild(renderInline(cell));
+          trH.appendChild(th);
+        }
+        thead.appendChild(trH);
+        table.appendChild(thead);
+
+        const tbody = document.createElement('tbody');
+        for (const row of block.rows || []) {
+          const tr = document.createElement('tr');
+          for (const cell of row) {
+            const td = document.createElement('td');
+            td.appendChild(renderInline(cell));
+            tr.appendChild(td);
+          }
+          tbody.appendChild(tr);
+        }
+        table.appendChild(tbody);
+        wrap.appendChild(table);
+        return wrap;
+      }
+
+      case 'list': {
+        const list = document.createElement(block.ordered ? 'ol' : 'ul');
+        list.className = 'block-list';
+        for (const item of block.items || []) {
+          const li = document.createElement('li');
+          li.appendChild(renderInline(item));
+          list.appendChild(li);
+        }
+        return list;
       }
 
       case 'code': {
@@ -319,7 +535,6 @@
 
         const header = document.createElement('div');
         header.className = 'block-code-header';
-
         const lang = document.createElement('span');
         lang.textContent = block.language || 'text';
         header.appendChild(lang);
@@ -337,9 +552,7 @@
               btn.textContent = 'copy';
               btn.classList.remove('copied');
             }, 1500);
-          } catch {
-            btn.textContent = 'err';
-          }
+          } catch { btn.textContent = 'err'; }
         });
         header.appendChild(btn);
 
@@ -347,29 +560,82 @@
         const code = document.createElement('code');
         code.textContent = block.content || '';
         pre.appendChild(code);
-
         wrap.appendChild(header);
         wrap.appendChild(pre);
         return wrap;
+      }
+
+      case 'hr': {
+        const hr = document.createElement('hr');
+        hr.className = 'block-hr';
+        return hr;
       }
 
       case 'prose':
       default: {
         const p = document.createElement('div');
         p.className = 'block-prose';
-        p.textContent = block.content || '';
+        if (Array.isArray(block.inline)) {
+          p.appendChild(renderInline(block.inline));
+        } else if (typeof block.content === 'string') {
+          const c = stripHtmlComments(block.content);
+          if (!c.trim()) break;
+          if (/^\s*<[a-z]/i.test(c) && /<\/[a-z]/i.test(c)) {
+            p.innerHTML = rewriteHtmlAssets(c);
+          } else {
+            p.textContent = c;
+          }
+        }
         return p;
       }
     }
   }
 
+  function labelForVariant(variant) {
+    switch ((variant || 'note').toLowerCase()) {
+      case 'note':      return 'ℹ Note';
+      case 'tip':       return '✦ Tip';
+      case 'important': return '❕ Important';
+      case 'warning':   return '⚠ Warning';
+      case 'caution':   return '⚡ Caution';
+      case 'danger':    return '✖ Danger';
+      case 'info':      return 'ℹ Info';
+      default:          return variant;
+    }
+  }
+
+  function setupScrollSpy(targetIds) {
+    const links = Array.from(tocEl.querySelectorAll('a'));
+    const targets = targetIds
+      .map(id => document.getElementById(id))
+      .filter(Boolean);
+
+    if (!targets.length) return;
+
+    const onScroll = () => {
+      const top = window.scrollY + 120;
+      let current = targets[0];
+      for (const t of targets) {
+        if (t.offsetTop <= top) current = t;
+        else break;
+      }
+      links.forEach(a => {
+        if (a.dataset.kind === 'heading') a.classList.remove('active');
+      });
+      const active = links.find(a => a.dataset.target === current.id);
+      if (active) active.classList.add('active');
+      const sec = links.find(a => a.dataset.kind === 'section' && a.dataset.target === currentSectionId);
+      if (sec && !active) sec.classList.add('active');
+    };
+
+    window.removeEventListener('scroll', onScroll);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  }
+
   function formatDate(iso) {
     if (!iso) return 'unknown';
-    try {
-      return new Date(iso).toLocaleString();
-    } catch {
-      return iso;
-    }
+    try { return new Date(iso).toLocaleString(); } catch { return iso; }
   }
 
   document.addEventListener('DOMContentLoaded', loadManifest);
