@@ -129,26 +129,44 @@
 
     buildSidebar();
 
+    // Добавляем делегирование событий для всех ссылок в TOC
+    tocEl.addEventListener('click', handleTocClick);
+
     window.addEventListener('hashchange', () => routeFromHash(true));
     routeFromHash(false);
+  }
+
+  // Обработчик кликов по ссылкам в sidebar
+  function handleTocClick(e) {
+    const link = e.target.closest('a[data-target]');
+    if (!link) return;
+
+    e.preventDefault();
+    const targetId = link.dataset.target;
+
+    // Обновляем hash и запускаем навигацию
+    location.hash = targetId;
   }
 
   function parseHash() {
     const raw = location.hash.replace(/^#/, '');
     if (!raw) return { sectionId: null, anchorId: null };
 
+    // Сначала проверяем точное совпадение с ID секции
     if (sectionById.has(raw)) {
       return { sectionId: raw, anchorId: null };
     }
 
-    const byPrefix = orderedSections.find(s => raw.startsWith(`sec-${s.id}-`));
-    if (byPrefix) return { sectionId: byPrefix.id, anchorId: raw };
-
-    const secRaw = raw.startsWith('sec-') ? raw.slice(4) : null;
-    if (secRaw && sectionById.has(secRaw)) {
-      return { sectionId: secRaw, anchorId: null };
+    // Проверяем, является ли это якорем внутри секции (формат: section-id-heading-slug)
+    // Ищем секцию, чей ID является префиксом текущего hash
+    for (const section of orderedSections) {
+      if (raw.startsWith(section.id + '-')) {
+        // Это якорь внутри секции
+        return { sectionId: section.id, anchorId: raw };
+      }
     }
 
+    // Если ничего не нашли, возвращаем первую секцию
     return { sectionId: null, anchorId: null };
   }
 
