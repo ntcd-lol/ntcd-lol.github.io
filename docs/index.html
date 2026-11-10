@@ -1,1 +1,196 @@
-<h1>In Dev.</h1>
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>ntcd_lol - docs</title>
+        <link rel="stylesheet" href="../static/style.css">
+    </head>
+    <body>
+        <header class="top-menu">
+            <div class="me">
+                <img src="https://avatars.githubusercontent.com/u/198263185?v=4" alt="ntcd_lol avatar">
+                <h2>ntcd_lol.</h2>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="https://ntcd-lol.github.io/">main();</a></li>
+                    <li><a href="https://ntcd-lol.github.io/docs/">docs();</a></li>
+                    <li><a href="https://ntcd-lol.github.io/question/">question();</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <div class="container">
+            <div class="block">
+                <h1>ntcd_lol - docs</h1>
+                <div class="accent-line"></div>
+
+                <p>Here is a list of my projects that include documentation:</p>
+
+                <div id="projects-container">
+                    <p id="projects-loading">Loading projects...</p>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        const PROJECTS_TOML_URL =
+            'https://gist.githubusercontent.com/ntcd-lol/a059a291a937e4c6cc69dd77a337c65f/raw/data.toml';
+
+
+        function parseColor(type, currentColor) {
+            switch (type) {
+                case "none":     return "gray";
+                case "draft":    return "blue";
+                case "partial":  return "yellow";
+                case "complete": return "green";
+                default: return currentColor;
+            }
+        }
+
+        function parseType(type) {
+            switch (type) {
+                case "none":     return "None...";
+                case "draft":    return "Draft";
+                case "partial":  return "Partial";
+                case "complete": return "Completed!";
+                default: return "Unknown?";
+            }
+        }
+
+        function parseProjectsToml(text) {
+            const projects = [];
+            let current = null;
+
+            const lines = text.split(/\r?\n/);
+            for (let rawLine of lines) {
+                const line = rawLine.replace(/#.*$/, '').trim();
+                if (!line) continue;
+
+                if (line === '[[projects]]') {
+                    if (current) projects.push(current);
+                    current = {};
+                    continue;
+                }
+
+                const eq = line.indexOf('=');
+                if (eq === -1 || !current) continue;
+
+                const key = line.slice(0, eq).trim();
+                let value = line.slice(eq + 1).trim();
+
+                // строковое значение
+                if (value.startsWith('"') && value.endsWith('"')) {
+                    value = value.slice(1, -1)
+                        .replace(/\\"/g, '"')
+                        .replace(/\\\\/g, '\\');
+                }
+
+                current[key] = value;
+            }
+            if (current) projects.push(current);
+            return projects;
+        }
+
+        function escapeHtml(str) {
+            return String(str ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function renderProjects(projects) {
+            const container = document.getElementById('projects-container');
+            container.innerHTML = '';
+
+            if (!projects.length) {
+                container.innerHTML = '<p>Projects not found.</p>';
+                return;
+            }
+
+            for (const p of projects) {
+                const card = document.createElement('div');
+                card.className = 'project';
+
+                const img = document.createElement('img');
+                img.src = p.icon || '';
+                img.alt = (p.name || 'project') + ' logo';
+                img.style.maxBlockSize = '10cap';
+                img.style.borderRadius = '50%';
+                img.loading = 'lazy';
+
+                const info = document.createElement('div');
+
+                const title = document.createElement('h2');
+                title.textContent = p.name || 'Untitled';
+
+                const desc = document.createElement('p');
+                desc.textContent = p.description || '';
+
+                const statusText = document.createElement('p');
+                statusText.textContent = 'Status: ';
+
+                const statusNow = document.createElement('span');
+                statusNow.style.color = parseColor(p.doc_status, statusNow.style.color);
+                statusNow.textContent = parseType(p.doc_status);
+
+                statusText.appendChild(statusNow);
+
+                const docsButtons = document.createElement('div');
+
+                const docsMd = document.createElement('a');
+                docsMd.className = "docsButton";
+                docsMd.href = p.linkMd || 0;
+
+                const docsHtml = document.createElement('a');
+                docsMd.className = "docsButton";
+                docsMd.href = p.linkMd || 0;
+
+                const docsTxt = document.createElement('a');
+                docsMd.className = "docsButton";
+                docsMd.href = p.linkMd || "";
+
+                if (docsMd.href != "") {
+                    docsButtons.appendChild(docsMd);
+                }
+
+                if (docsHtml.href != "") {
+                    docsButtons.appendChild(docsHtml);
+                }
+
+                if (docsTxt.href != "") {
+                    docsButtons.appendChild(docsTxt);
+                }
+
+                info.appendChild(title);
+                info.appendChild(desc);
+                info.appendChild(statusText);
+                info.appendChild(docsButtons);
+
+                card.appendChild(img);
+                card.appendChild(info);
+                container.appendChild(card);
+            }
+        }
+
+        async function loadProjects() {
+            const container = document.getElementById('projects-container');
+            try {
+                const res = await fetch(PROJECTS_TOML_URL, { cache: 'no-store' });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const text = await res.text();
+                const projects = parseProjectsToml(text);
+                renderProjects(projects);
+            } catch (err) {
+                console.error('Failed to load projects:', err);
+                container.innerHTML = '<p>Cannot load projects.</p>';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProjects();
+        });
+        </script>
+    </body>
+</html>

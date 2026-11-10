@@ -1,662 +1,654 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>pse-lua — docs</title>
-  <link rel="stylesheet" href="../../static/style.css">
-</head>
-<body>
-  <header class="top-menu">
-    <div class="me">
-      <img src="https://avatars.githubusercontent.com/u/198263185?v=4" alt="ntcd_lol avatar">
-      <h2>ntcd_lol.</h2>
-    </div>
-    <nav>
-      <ul>
-        <li><a href="https://ntcd-lol.github.io/">main();</a></li>
-        <li><a href="https://ntcd-lol.github.io/docs/">docs();</a></li>
-        <li><a href="https://ntcd-lol.github.io/question/">question();</a></li>
-      </ul>
-    </nav>
-  </header>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>pse-lua — docs</title>
+        <link rel="stylesheet" href="../../static/style.css">
+    </head>
+    <body>
+        <header class="top-menu">
+        <div class="me">
+            <img src="https://avatars.githubusercontent.com/u/198263185?v=4" alt="ntcd_lol avatar">
+            <h2>ntcd_lol.</h2>
+        </div>
+        <nav>
+            <ul>
+            <li><a href="https://ntcd-lol.github.io/">main();</a></li>
+            <li><a href="https://ntcd-lol.github.io/docs/">docs();</a></li>
+            <li><a href="https://ntcd-lol.github.io/question/">question();</a></li>
+            </ul>
+        </nav>
+        </header>
 
-  <div class="layout">
-    <aside class="sidebar" id="sidebar">
-      <h3>Contents</h3>
-      <ul id="toc"><li class="loading">Loading…</li></ul>
-    </aside>
+        <div class="layout">
+        <aside class="sidebar" id="sidebar">
+            <h3>Contents</h3>
+            <ul id="toc"><li class="loading">Loading…</li></ul>
+        </aside>
 
-    <div class="container docs-container">
-      <div id="app" class="page-host">
-        <p class="loading">Loading manifest…</p>
-      </div>
-    </div>
-  </div>
+        <div class="container docs-container">
+            <div id="app" class="page-host">
+            <p class="loading">Loading manifest…</p>
+            </div>
+        </div>
+        </div>
 
-  <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle sidebar">☰</button>
+        <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle sidebar">☰</button>
 
-  <script>
-  const GIST_RAW_URL =
-    'https://gist.githubusercontent.com/ntcd-lol/b4b3652e08f3272fd16cc1017311b3d9/raw/pselua-manifest.json';
+        <script>
+        const GIST_RAW_URL =
+            'https://gist.githubusercontent.com/ntcd-lol/b4b3652e08f3272fd16cc1017311b3d9/raw/pselua-manifest.json';
 
-  const RAW_BASE =
-    'https://raw.githubusercontent.com/ntcd-lol/pse-lua/main';
+        const RAW_BASE =
+            'https://raw.githubusercontent.com/ntcd-lol/pse-lua/main';
 
-  const app     = document.getElementById('app');
-  const tocEl   = document.getElementById('toc');
-  const sidebar = document.getElementById('sidebar');
-  const sidebarToggle = document.getElementById('sidebar-toggle');
+        const app     = document.getElementById('app');
+        const tocEl   = document.getElementById('toc');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebar-toggle');
 
-  const usedIds = new Set();
+        const usedIds = new Set();
 
-  let manifest = null;
-  let sectionById = new Map();
-  let orderedSections = [];
-  let currentSectionId = null;
+        let manifest = null;
+        let sectionById = new Map();
+        let orderedSections = [];
+        let currentSectionId = null;
 
-  sidebarToggle.addEventListener('click', () => sidebar.classList.toggle('open'));
+        sidebarToggle.addEventListener('click', () => sidebar.classList.toggle('open'));
 
-  function slugify(text) {
-    const map = {
-      'а':'a','б':'b','в':'v','г':'g','д':'d','е':'e','ё':'yo','ж':'zh',
-      'з':'z','и':'i','й':'y','к':'k','л':'l','м':'m','н':'n','о':'o',
-      'п':'p','р':'r','с':'s','т':'t','у':'u','ф':'f','х':'h','ц':'ts',
-      'ч':'ch','ш':'sh','щ':'sch','ъ':'','ы':'y','ь':'','э':'e','ю':'yu',
-      'я':'ya'
-    };
+        function slugify(text) {
+            const map = {
+                'а':'a','б':'b','в':'v','г':'g','д':'d','е':'e','ё':'yo','ж':'zh',
+                'з':'z','и':'i','й':'y','к':'k','л':'l','м':'m','н':'n','о':'o',
+                'п':'p','р':'r','с':'s','т':'t','у':'u','ф':'f','х':'h','ц':'ts',
+                'ч':'ch','ш':'sh','щ':'sch','ъ':'','ы':'y','ь':'','э':'e','ю':'yu',
+                'я':'ya'
+            };
 
-    return String(text || '')
-      .toLowerCase()
-      .split('')
-      .map(ch => map[ch] !== undefined ? map[ch] : ch)
-      .join('')
-      .replace(/[`*_~\[\](){}<>]/g, '')
-      .replace(/[^a-z0-9\s-]/g, '')
-      .trim()
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      .replace(/^-|-$/g, '') || 'section';
-  }
-
-  function ensureUniqueId(base) {
-    let id = base;
-    let n = 1;
-    while (usedIds.has(id)) {
-      id = `${base}-${n++}`;
-    }
-    usedIds.add(id);
-    return id;
-  }
-
-  function stripHtmlComments(s) {
-    return (s || '').replace(/<!--[\s\S]*?-->/g, '');
-  }
-
-  function absUrl(href) {
-    if (!href) return '#';
-    if (/^(https?:)?\/\//.test(href) || href.startsWith('#')) return href;
-    if (href.startsWith('/')) return RAW_BASE + href;
-    return href;
-  }
-
-  function rewriteHtmlAssets(html) {
-    return (html || '')
-      .replace(/\bsrc=(["'])(\/[^"']+)\1/g, (_, q, p) => `src=${q}${RAW_BASE}${p}${q}`)
-      .replace(/\bhref=(["'])(\/[^"']+)\1/g, (_, q, p) => {
-        if (p.startsWith('//')) return `href=${q}${p}${q}`;
-        return `href=${q}${RAW_BASE}${p}${q}`;
-      });
-  }
-
-  async function loadManifest() {
-    try {
-      const url = `${GIST_RAW_URL}?t=${Date.now()}`;
-      const res = await fetch(url, { cache: 'no-cache' });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      init(await res.json());
-    } catch (err) {
-      console.error(err);
-      app.innerHTML = `<p class="error">Failed to load manifest.json: ${err.message}</p>`;
-      tocEl.innerHTML = '<li class="error">Failed</li>';
-    }
-  }
-
-  function init(data) {
-    manifest = data;
-    orderedSections = Array.isArray(data.sections) ? data.sections : [];
-    sectionById = new Map(orderedSections.map(s => [s.id, s]));
-
-    buildSidebar();
-
-    // Добавляем делегирование событий для всех ссылок в TOC
-    tocEl.addEventListener('click', handleTocClick);
-
-    window.addEventListener('hashchange', () => routeFromHash(true));
-    routeFromHash(false);
-  }
-
-  // Обработчик кликов по ссылкам в sidebar
-  function handleTocClick(e) {
-    const link = e.target.closest('a[data-target]');
-    if (!link) return;
-
-    e.preventDefault();
-    const targetId = link.dataset.target;
-
-    // Обновляем hash и запускаем навигацию
-    location.hash = targetId;
-  }
-
-  function parseHash() {
-    const raw = location.hash.replace(/^#/, '');
-    if (!raw) return { sectionId: null, anchorId: null };
-
-    // Сначала проверяем точное совпадение с ID секции
-    if (sectionById.has(raw)) {
-      return { sectionId: raw, anchorId: null };
-    }
-
-    // Проверяем, является ли это якорем внутри секции (формат: section-id-heading-slug)
-    // Ищем секцию, чей ID является префиксом текущего hash
-    for (const section of orderedSections) {
-      if (raw.startsWith(section.id + '-')) {
-        // Это якорь внутри секции
-        return { sectionId: section.id, anchorId: raw };
-      }
-    }
-
-    // Если ничего не нашли, возвращаем первую секцию
-    return { sectionId: null, anchorId: null };
-  }
-
-  function routeFromHash(scroll) {
-    const { sectionId, anchorId } = parseHash();
-    const target = sectionId || (orderedSections[0] && orderedSections[0].id);
-    if (!target) return;
-
-    if (target !== currentSectionId) {
-      renderPage(target, () => {
-        if (anchorId) scrollToAnchor(anchorId);
-        else window.scrollTo({ top: 0, behavior: scroll ? 'smooth' : 'auto' });
-      });
-    } else if (anchorId) {
-      scrollToAnchor(anchorId);
-    } else if (scroll) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    updateActiveSidebar(target, anchorId);
-  }
-
-  function scrollToAnchor(id) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-
-  function buildSidebar() {
-    tocEl.innerHTML = '';
-
-    for (const section of orderedSections) {
-      const li = document.createElement('li');
-      li.className = 'toc-file';
-
-      const a = document.createElement('a');
-      a.href = `#${section.id}`;
-      a.textContent = section.title || section.id;
-      a.dataset.target = section.id;
-      a.dataset.kind = 'section';
-      li.appendChild(a);
-
-      const children = collectTocChildren(section);
-      if (children.length) {
-        const ul = document.createElement('ul');
-        for (const child of children) {
-          ul.appendChild(buildTocItem(child));
+            return String(text || '')
+                .toLowerCase()
+                .split('')
+                .map(ch => map[ch] !== undefined ? map[ch] : ch)
+                .join('')
+                .replace(/[`*_~\[\](){}<>]/g, '')
+                .replace(/[^a-z0-9\s-]/g, '')
+                .trim()
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-')
+                .replace(/^-|-$/g, '') || 'section';
         }
-        li.appendChild(ul);
-      }
 
-      tocEl.appendChild(li);
-    }
-  }
-
-  function buildTocItem(node) {
-    const li = document.createElement('li');
-
-    const a = document.createElement('a');
-    a.href = `#${node.id}`;
-    a.textContent = node.title;
-    a.dataset.target = node.id;
-    a.dataset.kind = 'heading';
-    li.appendChild(a);
-
-    if (node.children && node.children.length) {
-      const ul = document.createElement('ul');
-      for (const sub of node.children) {
-        ul.appendChild(buildTocItem(sub));
-      }
-      li.appendChild(ul);
-    }
-    return li;
-  }
-
-  function collectTocChildren(section) {
-    const tree = [];
-    for (const block of section.blocks || []) {
-      if (!block || block.type !== 'heading') continue;
-      const level = block.level || 3;
-      if (level > 3) continue;
-
-      const text = inlineToText(block.inline);
-      if (!text.trim()) continue;
-
-      const slug = slugify(text);
-      const id = `${section.id}-${slug}`;
-
-      if (level === 1 || level === 2) {
-        tree.push({ id, title: text.trim(), level, children: [] });
-      } else if (level === 3) {
-        const parent = [...tree].reverse().find(c => c.level <= 2);
-        if (parent) parent.children.push({ id, title: text.trim(), level });
-        else tree.push({ id, title: text.trim(), level, children: [] });
-      }
-    }
-    return tree;
-  }
-
-  function inlineToText(nodes) {
-    if (!Array.isArray(nodes)) return '';
-    return nodes.map(n => n.value || n.text || '').join('');
-  }
-
-  function updateActiveSidebar(sectionId, anchorId) {
-    const links = Array.from(tocEl.querySelectorAll('a'));
-    links.forEach(a => a.classList.remove('active'));
-
-    let active = null;
-    if (anchorId) {
-      active = links.find(a => a.dataset.target === anchorId);
-    }
-    if (!active && sectionId) {
-      active = links.find(a => a.dataset.kind === 'section' && a.dataset.target === sectionId);
-    }
-    if (active) active.classList.add('active');
-  }
-
-  function renderPage(sectionId, onDone) {
-    const section = sectionById.get(sectionId);
-    if (!section) return;
-
-    currentSectionId = sectionId;
-    usedIds.clear();
-
-    const oldPage = app.querySelector('.page');
-    const newPage = document.createElement('div');
-    newPage.className = 'page page-enter';
-    newPage.dataset.sectionId = sectionId;
-
-    const navTargets = [];
-    for (const block of section.blocks || []) {
-      const node = renderBlock(block, section.id, navTargets);
-      if (node) newPage.appendChild(node);
-    }
-
-    newPage.appendChild(buildPageNav(section.id));
-
-    const swap = () => {
-      if (oldPage) {
-        oldPage.classList.add('page-leave');
-        oldPage.addEventListener('animationend', () => oldPage.remove(), { once: true });
-        setTimeout(() => { if (oldPage.parentNode) oldPage.remove(); }, 400);
-      }
-      app.innerHTML = '';
-      app.appendChild(newPage);
-
-      requestAnimationFrame(() => {
-        newPage.classList.add('page-enter-active');
-        newPage.addEventListener('animationend', () => {
-          newPage.classList.remove('page-enter', 'page-enter-active');
-          if (onDone) onDone();
-          setupScrollSpy(navTargets);
-        }, { once: true });
-        setTimeout(() => {
-          newPage.classList.remove('page-enter', 'page-enter-active');
-          if (onDone) onDone();
-          setupScrollSpy(navTargets);
-        }, 500);
-      });
-    };
-
-    swap();
-  }
-
-  function buildPageNav(sectionId) {
-    const idx = orderedSections.findIndex(s => s.id === sectionId);
-    const prev = orderedSections[idx - 1];
-    const next = orderedSections[idx + 1];
-
-    const nav = document.createElement('nav');
-    nav.className = 'page-nav';
-
-    if (prev) {
-      const a = document.createElement('a');
-      a.href = `#${prev.id}`;
-      a.className = 'page-nav-prev';
-      a.textContent = `← ${prev.title || prev.id}`;
-      nav.appendChild(a);
-    } else {
-      nav.appendChild(document.createElement('span'));
-    }
-
-    if (next) {
-      const a = document.createElement('a');
-      a.href = `#${next.id}`;
-      a.className = 'page-nav-next';
-      a.textContent = `${next.title || next.id} →`;
-      nav.appendChild(a);
-    } else {
-      nav.appendChild(document.createElement('span'));
-    }
-
-    return nav;
-  }
-
-  function renderInline(nodes) {
-    const frag = document.createDocumentFragment();
-
-    if (!Array.isArray(nodes)) {
-      if (typeof nodes === 'string') {
-        const v = stripHtmlComments(nodes);
-        if (!v) return frag;
-        if (/^\s*<[a-z]/i.test(v) && /<\/[a-z]/i.test(v)) {
-          const span = document.createElement('span');
-          span.innerHTML = rewriteHtmlAssets(v);
-          frag.appendChild(span);
-        } else {
-          frag.appendChild(document.createTextNode(v));
+        function ensureUniqueId(base) {
+            let id = base;
+            let n = 1;
+            while (usedIds.has(id)) {
+                id = `${base}-${n++}`;
+            }
+            usedIds.add(id);
+            return id;
         }
-      }
-      return frag;
-    }
 
-    for (const n of nodes) {
-      if (!n) continue;
-      switch (n.type) {
-        case 'text': {
-          const v = stripHtmlComments(n.value || '');
-          if (!v) break;
-          if (/^\s*<[a-z]/i.test(v) && /<\/[a-z]/i.test(v)) {
-            const span = document.createElement('span');
-            span.innerHTML = rewriteHtmlAssets(v);
-            frag.appendChild(span);
-          } else {
-            frag.appendChild(document.createTextNode(v));
-          }
-          break;
+        function stripHtmlComments(s) {
+            return (s || '').replace(/<!--[\s\S]*?-->/g, '');
         }
-        case 'code': {
-          const el = document.createElement('code');
-          el.className = 'inline-code';
-          el.textContent = n.value || '';
-          frag.appendChild(el);
-          break;
+
+        function absUrl(href) {
+            if (!href) return '#';
+            if (/^(https?:)?\/\//.test(href) || href.startsWith('#')) return href;
+            if (href.startsWith('/')) return RAW_BASE + href;
+            return href;
         }
-        case 'bold': {
-          const el = document.createElement('strong');
-          el.textContent = n.value || '';
-          frag.appendChild(el);
-          break;
+
+        function rewriteHtmlAssets(html) {
+            return (html || '')
+                .replace(/\bsrc=(["'])(\/[^"']+)\1/g, (_, q, p) => `src=${q}${RAW_BASE}${p}${q}`)
+                .replace(/\bhref=(["'])(\/[^"']+)\1/g, (_, q, p) => {
+                    if (p.startsWith('//')) return `href=${q}${p}${q}`;
+                    return `href=${q}${RAW_BASE}${p}${q}`;
+                });
         }
-        case 'italic': {
-          const el = document.createElement('em');
-          el.textContent = n.value || '';
-          frag.appendChild(el);
-          break;
+
+        async function loadManifest() {
+            try {
+                const url = `${GIST_RAW_URL}?t=${Date.now()}`;
+                const res = await fetch(url, { cache: 'no-cache' });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                init(await res.json());
+            } catch (err) {
+                console.error(err);
+                app.innerHTML = `<p class="error">Failed to load manifest.json: ${err.message}</p>`;
+                tocEl.innerHTML = '<li class="error">Failed</li>';
+            }
         }
-        case 'link': {
-          const a = document.createElement('a');
-          a.href = absUrl(n.href || '#');
-          a.textContent = n.text || '';
-          if (!n.href || !n.href.startsWith('#')) {
-            a.target = '_blank';
-            a.rel = 'noopener';
-          }
-          frag.appendChild(a);
-          break;
+
+        function init(data) {
+            manifest = data;
+            orderedSections = Array.isArray(data.sections) ? data.sections : [];
+            sectionById = new Map(orderedSections.map(s => [s.id, s]));
+
+            buildSidebar();
+
+            tocEl.addEventListener('click', handleTocClick);
+
+            window.addEventListener('hashchange', () => routeFromHash(true));
+            routeFromHash(false);
         }
-        case 'image': {
-          const img = document.createElement('img');
-          img.src = absUrl(n.src || '');
-          img.alt = n.alt || '';
-          img.style.maxWidth = '100%';
-          img.style.height = 'auto';
-          frag.appendChild(img);
-          break;
+
+        function handleTocClick(e) {
+            const link = e.target.closest('a[data-target]');
+            if (!link) return;
+
+            e.preventDefault();
+            const targetId = link.dataset.target;
+
+            location.hash = targetId;
         }
-        default:
-          frag.appendChild(document.createTextNode(String(n.value || '')));
-      }
-    }
-    return frag;
-  }
 
-  function renderBlock(block, sectionId, navTargets) {
-    if (!block || typeof block !== 'object') {
-      const p = document.createElement('div');
-      p.className = 'block-prose';
-      p.textContent = String(block);
-      return p;
-    }
+        function parseHash() {
+            const raw = location.hash.replace(/^#/, '');
+            if (!raw) return { sectionId: null, anchorId: null };
 
-    switch (block.type) {
-      case 'heading': {
-        const level = block.level || 3;
-        const el = document.createElement('div');
-        el.className = 'block-heading';
-        el.dataset.level = level;
+            if (sectionById.has(raw)) {
+                return { sectionId: raw, anchorId: null };
+            }
 
-        const text = inlineToText(block.inline);
-        const baseSlug = slugify(text);
-        const uniqueId = ensureUniqueId(`${sectionId}-${baseSlug}`);
-        el.id = uniqueId;
-        navTargets.push(uniqueId);
+            for (const section of orderedSections) {
+                if (raw.startsWith(section.id + '-')) {
+                    return { sectionId: section.id, anchorId: raw };
+                }
+            }
 
-        if (Array.isArray(block.inline)) {
-          el.appendChild(renderInline(block.inline));
-        } else if (typeof block.content === 'string') {
-          const c = stripHtmlComments(block.content);
-          if (/^\s*<[a-z]/i.test(c) && /<\/[a-z]/i.test(c)) {
-            el.innerHTML = rewriteHtmlAssets(c);
-          } else {
-            el.textContent = c;
-          }
+            return { sectionId: null, anchorId: null };
         }
-        return el;
-      }
 
-      case 'callout': {
-        const box = document.createElement('div');
-        box.className = 'block-callout';
-        box.dataset.variant = block.variant || 'note';
+        function routeFromHash(scroll) {
+            const { sectionId, anchorId } = parseHash();
+            const target = sectionId || (orderedSections[0] && orderedSections[0].id);
+            if (!target) return;
 
-        const head = document.createElement('div');
-        head.className = 'block-callout-head';
-        head.textContent = labelForVariant(block.variant);
-        box.appendChild(head);
+            if (target !== currentSectionId) {
+                renderPage(target, () => {
+                    if (anchorId) scrollToAnchor(anchorId);
+                    else window.scrollTo({ top: 0, behavior: scroll ? 'smooth' : 'auto' });
+                });
+            } else if (anchorId) {
+                scrollToAnchor(anchorId);
+            } else if (scroll) {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
 
-        const body = document.createElement('div');
-        body.className = 'block-callout-body';
-        if (Array.isArray(block.inline)) {
-          body.appendChild(renderInline(block.inline));
-        } else if (typeof block.content === 'string') {
-          body.textContent = stripHtmlComments(block.content);
+            updateActiveSidebar(target, anchorId);
         }
-        box.appendChild(body);
-        return box;
-      }
 
-      case 'html': {
-        const el = document.createElement('div');
-        el.className = 'block-html';
-        const cleaned = stripHtmlComments(block.content || '');
-        el.innerHTML = rewriteHtmlAssets(cleaned);
-        return el;
-      }
-
-      case 'table': {
-        const wrap = document.createElement('div');
-        wrap.className = 'block-table-wrap';
-        const table = document.createElement('table');
-        table.className = 'block-table';
-
-        const thead = document.createElement('thead');
-        const trH = document.createElement('tr');
-        for (const cell of block.header || []) {
-          const th = document.createElement('th');
-          th.appendChild(renderInline(cell));
-          trH.appendChild(th);
+        function scrollToAnchor(id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
-        thead.appendChild(trH);
-        table.appendChild(thead);
 
-        const tbody = document.createElement('tbody');
-        for (const row of block.rows || []) {
-          const tr = document.createElement('tr');
-          for (const cell of row) {
-            const td = document.createElement('td');
-            td.appendChild(renderInline(cell));
-            tr.appendChild(td);
-          }
-          tbody.appendChild(tr);
+        function buildSidebar() {
+            tocEl.innerHTML = '';
+
+            for (const section of orderedSections) {
+                const li = document.createElement('li');
+                li.className = 'toc-file';
+
+                const a = document.createElement('a');
+                a.href = `#${section.id}`;
+                a.textContent = section.title || section.id;
+                a.dataset.target = section.id;
+                a.dataset.kind = 'section';
+                li.appendChild(a);
+
+                const children = collectTocChildren(section);
+                if (children.length) {
+                    const ul = document.createElement('ul');
+                    for (const child of children) {
+                        ul.appendChild(buildTocItem(child));
+                    }
+                    li.appendChild(ul);
+                }
+
+                tocEl.appendChild(li);
+            }
         }
-        table.appendChild(tbody);
-        wrap.appendChild(table);
-        return wrap;
-      }
 
-      case 'list': {
-        const list = document.createElement(block.ordered ? 'ol' : 'ul');
-        list.className = 'block-list';
-        for (const item of block.items || []) {
-          const li = document.createElement('li');
-          li.appendChild(renderInline(item));
-          list.appendChild(li);
+        function buildTocItem(node) {
+            const li = document.createElement('li');
+
+            const a = document.createElement('a');
+            a.href = `#${node.id}`;
+            a.textContent = node.title;
+            a.dataset.target = node.id;
+            a.dataset.kind = 'heading';
+            li.appendChild(a);
+
+            if (node.children && node.children.length) {
+                const ul = document.createElement('ul');
+                for (const sub of node.children) {
+                    ul.appendChild(buildTocItem(sub));
+                }
+                li.appendChild(ul);
+            }
+            return li;
         }
-        return list;
-      }
 
-      case 'code': {
-        const wrap = document.createElement('div');
-        wrap.className = 'block-code';
+        function collectTocChildren(section) {
+            const tree = [];
+            for (const block of section.blocks || []) {
+                if (!block || block.type !== 'heading') continue;
+                const level = block.level || 3;
+                if (level > 3) continue;
 
-        const header = document.createElement('div');
-        header.className = 'block-code-header';
-        const lang = document.createElement('span');
-        lang.textContent = block.language || 'text';
-        header.appendChild(lang);
+                const text = inlineToText(block.inline);
+                if (!text.trim()) continue;
 
-        const btn = document.createElement('button');
-        btn.className = 'copy-btn';
-        btn.type = 'button';
-        btn.textContent = 'copy';
-        btn.addEventListener('click', async () => {
-          try {
-            await navigator.clipboard.writeText(block.content || '');
-            btn.textContent = 'copied';
-            btn.classList.add('copied');
-            setTimeout(() => {
-              btn.textContent = 'copy';
-              btn.classList.remove('copied');
-            }, 1500);
-          } catch { btn.textContent = 'err'; }
-        });
-        header.appendChild(btn);
+                const slug = slugify(text);
+                const id = `${section.id}-${slug}`;
 
-        const pre = document.createElement('pre');
-        const code = document.createElement('code');
-        code.textContent = block.content || '';
-        pre.appendChild(code);
-        wrap.appendChild(header);
-        wrap.appendChild(pre);
-        return wrap;
-      }
-
-      case 'hr': {
-        const hr = document.createElement('hr');
-        hr.className = 'block-hr';
-        return hr;
-      }
-
-      case 'prose':
-      default: {
-        const p = document.createElement('div');
-        p.className = 'block-prose';
-        if (Array.isArray(block.inline)) {
-          p.appendChild(renderInline(block.inline));
-        } else if (typeof block.content === 'string') {
-          const c = stripHtmlComments(block.content);
-          if (!c.trim()) break;
-          if (/^\s*<[a-z]/i.test(c) && /<\/[a-z]/i.test(c)) {
-            p.innerHTML = rewriteHtmlAssets(c);
-          } else {
-            p.textContent = c;
-          }
+                if (level === 1 || level === 2) {
+                    tree.push({ id, title: text.trim(), level, children: [] });
+                } else if (level === 3) {
+                    const parent = [...tree].reverse().find(c => c.level <= 2);
+                    if (parent) parent.children.push({ id, title: text.trim(), level });
+                    else tree.push({ id, title: text.trim(), level, children: [] });
+                }
+            }
+            return tree;
         }
-        return p;
-      }
-    }
-  }
 
-  function labelForVariant(variant) {
-    switch ((variant || 'note').toLowerCase()) {
-      case 'note':      return 'ℹ Note';
-      case 'tip':       return '✦ Tip';
-      case 'important': return '❕ Important';
-      case 'warning':   return '⚠ Warning';
-      case 'caution':   return '⚡ Caution';
-      case 'danger':    return '✖ Danger';
-      case 'info':      return 'ℹ Info';
-      default:          return variant;
-    }
-  }
+        function inlineToText(nodes) {
+            if (!Array.isArray(nodes)) return '';
+            return nodes.map(n => n.value || n.text || '').join('');
+        }
 
-  function setupScrollSpy(targetIds) {
-    const links = Array.from(tocEl.querySelectorAll('a'));
-    const targets = targetIds
-      .map(id => document.getElementById(id))
-      .filter(Boolean);
+        function updateActiveSidebar(sectionId, anchorId) {
+            const links = Array.from(tocEl.querySelectorAll('a'));
+            links.forEach(a => a.classList.remove('active'));
 
-    if (!targets.length) return;
+            let active = null;
+            if (anchorId) {
+                active = links.find(a => a.dataset.target === anchorId);
+            }
+            if (!active && sectionId) {
+                active = links.find(a => a.dataset.kind === 'section' && a.dataset.target === sectionId);
+            }
+            if (active) active.classList.add('active');
+        }
 
-    const onScroll = () => {
-      const top = window.scrollY + 120;
-      let current = targets[0];
-      for (const t of targets) {
-        if (t.offsetTop <= top) current = t;
-        else break;
-      }
-      links.forEach(a => {
-        if (a.dataset.kind === 'heading') a.classList.remove('active');
-      });
-      const active = links.find(a => a.dataset.target === current.id);
-      if (active) active.classList.add('active');
-      const sec = links.find(a => a.dataset.kind === 'section' && a.dataset.target === currentSectionId);
-      if (sec && !active) sec.classList.add('active');
-    };
+        function renderPage(sectionId, onDone) {
+            const section = sectionById.get(sectionId);
+            if (!section) return;
 
-    window.removeEventListener('scroll', onScroll);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
-  }
+            currentSectionId = sectionId;
+            usedIds.clear();
 
-  function formatDate(iso) {
-    if (!iso) return 'unknown';
-    try { return new Date(iso).toLocaleString(); } catch { return iso; }
-  }
+            const oldPage = app.querySelector('.page');
+            const newPage = document.createElement('div');
+            newPage.className = 'page page-enter';
+            newPage.dataset.sectionId = sectionId;
 
-  document.addEventListener('DOMContentLoaded', loadManifest);
-  </script>
-</body>
+            const navTargets = [];
+            for (const block of section.blocks || []) {
+                const node = renderBlock(block, section.id, navTargets);
+                if (node) newPage.appendChild(node);
+            }
+
+            newPage.appendChild(buildPageNav(section.id));
+
+            const swap = () => {
+                if (oldPage) {
+                    oldPage.classList.add('page-leave');
+                    oldPage.addEventListener('animationend', () => oldPage.remove(), { once: true });
+                    setTimeout(() => { if (oldPage.parentNode) oldPage.remove(); }, 400);
+                }
+                app.innerHTML = '';
+                app.appendChild(newPage);
+
+                requestAnimationFrame(() => {
+                    newPage.classList.add('page-enter-active');
+                    newPage.addEventListener('animationend', () => {
+                        newPage.classList.remove('page-enter', 'page-enter-active');
+                        if (onDone) onDone();
+                        setupScrollSpy(navTargets);
+                    }, { once: true });
+                    setTimeout(() => {
+                        newPage.classList.remove('page-enter', 'page-enter-active');
+                        if (onDone) onDone();
+                        setupScrollSpy(navTargets);
+                    }, 500);
+                });
+            };
+
+            swap();
+        }
+
+        function buildPageNav(sectionId) {
+            const idx = orderedSections.findIndex(s => s.id === sectionId);
+            const prev = orderedSections[idx - 1];
+            const next = orderedSections[idx + 1];
+
+            const nav = document.createElement('nav');
+            nav.className = 'page-nav';
+
+            if (prev) {
+                const a = document.createElement('a');
+                a.href = `#${prev.id}`;
+                a.className = 'page-nav-prev';
+                a.textContent = `← ${prev.title || prev.id}`;
+                nav.appendChild(a);
+            } else {
+                nav.appendChild(document.createElement('span'));
+            }
+
+            if (next) {
+                const a = document.createElement('a');
+                a.href = `#${next.id}`;
+                a.className = 'page-nav-next';
+                a.textContent = `${next.title || next.id} →`;
+                nav.appendChild(a);
+            } else {
+                nav.appendChild(document.createElement('span'));
+            }
+
+            return nav;
+        }
+
+        function renderInline(nodes) {
+            const frag = document.createDocumentFragment();
+
+            if (!Array.isArray(nodes)) {
+                if (typeof nodes === 'string') {
+                    const v = stripHtmlComments(nodes);
+                    if (!v) return frag;
+                    if (/^\s*<[a-z]/i.test(v) && /<\/[a-z]/i.test(v)) {
+                        const span = document.createElement('span');
+                        span.innerHTML = rewriteHtmlAssets(v);
+                        frag.appendChild(span);
+                    } else {
+                        frag.appendChild(document.createTextNode(v));
+                    }
+                }
+                return frag;
+            }
+
+            for (const n of nodes) {
+                if (!n) continue;
+                switch (n.type) {
+                    case 'text': {
+                        const v = stripHtmlComments(n.value || '');
+                        if (!v) break;
+                        if (/^\s*<[a-z]/i.test(v) && /<\/[a-z]/i.test(v)) {
+                            const span = document.createElement('span');
+                            span.innerHTML = rewriteHtmlAssets(v);
+                            frag.appendChild(span);
+                        } else {
+                            frag.appendChild(document.createTextNode(v));
+                        }
+                        break;
+                    }
+                    case 'code': {
+                        const el = document.createElement('code');
+                        el.className = 'inline-code';
+                        el.textContent = n.value || '';
+                        frag.appendChild(el);
+                        break;
+                    }
+                    case 'bold': {
+                        const el = document.createElement('strong');
+                        el.textContent = n.value || '';
+                        frag.appendChild(el);
+                        break;
+                    }
+                    case 'italic': {
+                        const el = document.createElement('em');
+                        el.textContent = n.value || '';
+                        frag.appendChild(el);
+                        break;
+                    }
+                    case 'link': {
+                        const a = document.createElement('a');
+                        a.href = absUrl(n.href || '#');
+                        a.textContent = n.text || '';
+                        if (!n.href || !n.href.startsWith('#')) {
+                            a.target = '_blank';
+                            a.rel = 'noopener';
+                        }
+                        frag.appendChild(a);
+                        break;
+                    }
+                    case 'image': {
+                        const img = document.createElement('img');
+                        img.src = absUrl(n.src || '');
+                        img.alt = n.alt || '';
+                        img.style.maxWidth = '100%';
+                        img.style.height = 'auto';
+                        frag.appendChild(img);
+                        break;
+                    }
+                    default:
+                        frag.appendChild(document.createTextNode(String(n.value || '')));
+                }
+            }
+            return frag;
+        }
+
+        function renderBlock(block, sectionId, navTargets) {
+            if (!block || typeof block !== 'object') {
+                const p = document.createElement('div');
+                p.className = 'block-prose';
+                p.textContent = String(block);
+                return p;
+            }
+
+            switch (block.type) {
+                case 'heading': {
+                    const level = block.level || 3;
+                    const el = document.createElement('div');
+                    el.className = 'block-heading';
+                    el.dataset.level = level;
+
+                    const text = inlineToText(block.inline);
+                    const baseSlug = slugify(text);
+                    const uniqueId = ensureUniqueId(`${sectionId}-${baseSlug}`);
+                    el.id = uniqueId;
+                    navTargets.push(uniqueId);
+
+                    if (Array.isArray(block.inline)) {
+                        el.appendChild(renderInline(block.inline));
+                    } else if (typeof block.content === 'string') {
+                        const c = stripHtmlComments(block.content);
+                        if (/^\s*<[a-z]/i.test(c) && /<\/[a-z]/i.test(c)) {
+                            el.innerHTML = rewriteHtmlAssets(c);
+                        } else {
+                            el.textContent = c;
+                        }
+                    }
+                    return el;
+                }
+
+                case 'callout': {
+                    const box = document.createElement('div');
+                    box.className = 'block-callout';
+                    box.dataset.variant = block.variant || 'note';
+
+                    const head = document.createElement('div');
+                    head.className = 'block-callout-head';
+                    head.textContent = labelForVariant(block.variant);
+                    box.appendChild(head);
+
+                    const body = document.createElement('div');
+                    body.className = 'block-callout-body';
+                    if (Array.isArray(block.inline)) {
+                        body.appendChild(renderInline(block.inline));
+                    } else if (typeof block.content === 'string') {
+                        body.textContent = stripHtmlComments(block.content);
+                    }
+                    box.appendChild(body);
+                    return box;
+                }
+
+                case 'html': {
+                    const el = document.createElement('div');
+                    el.className = 'block-html';
+                    const cleaned = stripHtmlComments(block.content || '');
+                    el.innerHTML = rewriteHtmlAssets(cleaned);
+                    return el;
+                }
+
+                case 'table': {
+                    const wrap = document.createElement('div');
+                    wrap.className = 'block-table-wrap';
+                    const table = document.createElement('table');
+                    table.className = 'block-table';
+
+                    const thead = document.createElement('thead');
+                    const trH = document.createElement('tr');
+                    for (const cell of block.header || []) {
+                        const th = document.createElement('th');
+                        th.appendChild(renderInline(cell));
+                        trH.appendChild(th);
+                    }
+                    thead.appendChild(trH);
+                    table.appendChild(thead);
+
+                    const tbody = document.createElement('tbody');
+                    for (const row of block.rows || []) {
+                        const tr = document.createElement('tr');
+                        for (const cell of row) {
+                            const td = document.createElement('td');
+                            td.appendChild(renderInline(cell));
+                            tr.appendChild(td);
+                        }
+                        tbody.appendChild(tr);
+                    }
+                    table.appendChild(tbody);
+                    wrap.appendChild(table);
+                    return wrap;
+                }
+
+                case 'list': {
+                    const list = document.createElement(block.ordered ? 'ol' : 'ul');
+                    list.className = 'block-list';
+                    for (const item of block.items || []) {
+                        const li = document.createElement('li');
+                        li.appendChild(renderInline(item));
+                        list.appendChild(li);
+                    }
+                    return list;
+                }
+
+                case 'code': {
+                    const wrap = document.createElement('div');
+                    wrap.className = 'block-code';
+
+                    const header = document.createElement('div');
+                    header.className = 'block-code-header';
+                    const lang = document.createElement('span');
+                    lang.textContent = block.language || 'text';
+                    header.appendChild(lang);
+
+                    const btn = document.createElement('button');
+                    btn.className = 'copy-btn';
+                    btn.type = 'button';
+                    btn.textContent = 'copy';
+                    btn.addEventListener('click', async () => {
+                        try {
+                            await navigator.clipboard.writeText(block.content || '');
+                            btn.textContent = 'copied';
+                            btn.classList.add('copied');
+                            setTimeout(() => {
+                                btn.textContent = 'copy';
+                                btn.classList.remove('copied');
+                            }, 1500);
+                        } catch { btn.textContent = 'err'; }
+                    });
+                    header.appendChild(btn);
+
+                    const pre = document.createElement('pre');
+                    const code = document.createElement('code');
+                    code.textContent = block.content || '';
+                    pre.appendChild(code);
+                    wrap.appendChild(header);
+                    wrap.appendChild(pre);
+                    return wrap;
+                }
+
+                case 'hr': {
+                    const hr = document.createElement('hr');
+                    hr.className = 'block-hr';
+                    return hr;
+                }
+
+                case 'prose':
+                default: {
+                    const p = document.createElement('div');
+                    p.className = 'block-prose';
+                    if (Array.isArray(block.inline)) {
+                        p.appendChild(renderInline(block.inline));
+                    } else if (typeof block.content === 'string') {
+                        const c = stripHtmlComments(block.content);
+                        if (!c.trim()) break;
+                        if (/^\s*<[a-z]/i.test(c) && /<\/[a-z]/i.test(c)) {
+                            p.innerHTML = rewriteHtmlAssets(c);
+                        } else {
+                            p.textContent = c;
+                        }
+                    }
+                    return p;
+                }
+            }
+        }
+
+        function labelForVariant(variant) {
+            switch ((variant || 'note').toLowerCase()) {
+                case 'note':      return 'ℹ Note';
+                case 'tip':       return '✦ Tip';
+                case 'important': return '❕ Important';
+                case 'warning':   return '⚠ Warning';
+                case 'caution':   return '⚡ Caution';
+                case 'danger':    return '✖ Danger';
+                case 'info':      return 'ℹ Info';
+                default:          return variant;
+            }
+        }
+
+        function setupScrollSpy(targetIds) {
+            const links = Array.from(tocEl.querySelectorAll('a'));
+            const targets = targetIds
+                .map(id => document.getElementById(id))
+                .filter(Boolean);
+
+            if (!targets.length) return;
+
+            const onScroll = () => {
+                const top = window.scrollY + 120;
+                let current = targets[0];
+                for (const t of targets) {
+                    if (t.offsetTop <= top) current = t;
+                    else break;
+                }
+                links.forEach(a => {
+                    if (a.dataset.kind === 'heading') a.classList.remove('active');
+                });
+                const active = links.find(a => a.dataset.target === current.id);
+                if (active) active.classList.add('active');
+                const sec = links.find(a => a.dataset.kind === 'section' && a.dataset.target === currentSectionId);
+                if (sec && !active) sec.classList.add('active');
+            };
+
+            window.removeEventListener('scroll', onScroll);
+            window.addEventListener('scroll', onScroll, { passive: true });
+            onScroll();
+        }
+
+        function formatDate(iso) {
+            if (!iso) return 'unknown';
+            try { return new Date(iso).toLocaleString(); } catch { return iso; }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadManifest);
+        </script>
+    </body>
 </html>
